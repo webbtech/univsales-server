@@ -47,8 +47,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: graphql.graphqlHandler
-      Runtime: nodejs10.x # doesn't work with sam local
-      # Runtime: nodejs8.10
+      Runtime: nodejs10.x
       CodeUri: build/
       Role: !GetAtt LambdaRole.Arn
       Timeout: 10

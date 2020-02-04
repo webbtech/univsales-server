@@ -12,7 +12,7 @@ db.connect = async function connect(cfg) {
   this.cfg = cfg
   this.setUri()
 
-  mongoose.connect(this.uri, { useNewUrlParser: true })
+  mongoose.connect(this.uri, { useNewUrlParser: true, useUnifiedTopology: true })
   mongoose.set('useCreateIndex', true)
   mongoose.set('useNewUrlParser', true)
   mongoose.set('useFindAndModify', false)
