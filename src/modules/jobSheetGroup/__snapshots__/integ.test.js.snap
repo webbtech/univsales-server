@@ -1,0 +1,148 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`jobSheetGroup 1`] = `
+Object {
+  "data": Object {
+    "jobSheetGroup": Object {
+      "_id": "5b195db0c2e75ffe21fdd0ed",
+      "costs": Object {
+        "__typename": "JobSheetGroupCosts",
+        "discounted": 0,
+        "extendTotal": 3450,
+        "extendUnit": 3450,
+        "install": 1000,
+        "installType": 500,
+        "netUnit": 3450,
+        "options": 150,
+        "trim": 100,
+        "windows": 1700,
+      },
+      "createdAt": "1528389040817",
+      "dims": Object {
+        "__typename": "JobSheetGroupDims",
+        "height": Object {
+          "__typename": "GroupWindowDims",
+          "decimal": 22,
+          "diff": -40,
+          "fraction": "",
+          "inch": 22,
+        },
+        "width": Object {
+          "__typename": "GroupWindowDims",
+          "decimal": 22,
+          "diff": -80,
+          "fraction": "",
+          "inch": 22,
+        },
+      },
+      "items": Array [
+        Object {
+          "__typename": "JobSheetGroupItem",
+          "_id": "5b1a70452aac048edc7ec028",
+          "costs": Object {
+            "__typename": "GroupItemCosts",
+            "extendTotal": 860,
+            "extendUnit": 430,
+          },
+          "dims": Object {
+            "__typename": "GroupItemDims",
+            "height": Object {
+              "__typename": "WindowDims",
+              "decimal": 62,
+              "fraction": null,
+              "inch": 62,
+              "overSize": null,
+              "round": 62,
+              "underSize": null,
+            },
+            "width": Object {
+              "__typename": "WindowDims",
+              "decimal": 21,
+              "fraction": null,
+              "inch": 21,
+              "overSize": null,
+              "round": 22,
+              "underSize": null,
+            },
+          },
+          "product": Object {
+            "name": "2 Casements (L & R)",
+          },
+          "productID": "57855061982d822a04b760a8",
+          "qty": 2,
+          "specs": Object {
+            "extendSqft": 20,
+            "overSize": 0,
+            "sqft": 10,
+          },
+        },
+        Object {
+          "__typename": "JobSheetGroupItem",
+          "_id": "5b1a70452aac048f427ec027",
+          "costs": Object {
+            "__typename": "GroupItemCosts",
+            "extendTotal": 840,
+            "extendUnit": 280,
+          },
+          "dims": Object {
+            "__typename": "GroupItemDims",
+            "height": Object {
+              "__typename": "WindowDims",
+              "decimal": 62,
+              "fraction": null,
+              "inch": 62,
+              "overSize": null,
+              "round": 62,
+              "underSize": null,
+            },
+            "width": Object {
+              "__typename": "WindowDims",
+              "decimal": 20,
+              "fraction": null,
+              "inch": 20,
+              "overSize": null,
+              "round": 20,
+              "underSize": null,
+            },
+          },
+          "product": Object {
+            "name": "Fixed",
+          },
+          "productID": "57855061982d822a04b760a4",
+          "qty": 3,
+          "specs": Object {
+            "extendSqft": 27,
+            "overSize": 0,
+            "sqft": 9,
+          },
+        },
+      ],
+      "jobsheetID": "5b1846d52aac0450227ebfe9",
+      "qty": 1,
+      "rooms": Array [
+        "DR",
+      ],
+      "specs": Object {
+        "groupTypeDescription": "Bow Window 2 Casements, 3 Fixed",
+        "installType": null,
+        "options": "Pebble: Low E & Argon Gas (dark)
+Colonial Bars
+",
+        "sqft": 4,
+        "style": null,
+        "trim": "B.M. & Interior \\"J\\"
+2 3/4\\" F.J. Trim
+",
+      },
+      "updatedAt": "1528459333070",
+    },
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;

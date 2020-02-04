@@ -1,0 +1,65 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`get quote 1`] = `
+Object {
+  "data": Object {
+    "quote": Object {
+      "__typename": "Quote",
+      "_id": "5cc7a74507651808c8d191c7",
+      "closed": true,
+      "customerID": Object {
+        "_id": "5bf85258ea79e14fe99c13d1",
+        "name": Object {
+          "first": "Bev",
+          "last": "Atterbury",
+        },
+      },
+      "discount": Object {
+        "description": "",
+        "discount": 0,
+        "subtotal": 0,
+        "tax": 0,
+        "total": 0,
+      },
+      "invoiced": true,
+      "itemCosts": Object {
+        "group": 3750,
+        "other": 0,
+        "subtotal": 3750,
+        "window": 0,
+      },
+      "items": Object {
+        "group": Array [
+          "5bf8539bea79e148c69c13d4",
+        ],
+        "other": Array [],
+        "window": Array [],
+      },
+      "jobsheetID": Object {
+        "_id": "5bf8526aea79e157bb9c13d3",
+        "addressID": Object {
+          "_id": "5bf8526aea79e1449a9c13d2",
+          "city": "St. Catharines",
+          "street1": "18 Village Green Dr",
+        },
+      },
+      "number": 1472,
+      "quotePrice": Object {
+        "outstanding": 0,
+        "payments": 3750,
+        "subtotal": 3318.5840707964603,
+        "tax": 431.4159292035397,
+        "total": 3750,
+      },
+      "version": 1,
+    },
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;
