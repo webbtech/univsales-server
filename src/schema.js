@@ -1,4 +1,4 @@
-import { gql } from 'apollo-server'
+import { gql } from 'apollo-server' // eslint-disable-line import/no-extraneous-dependencies
 import { merge } from 'lodash'
 import GraphQLJSON, { GraphQLJSONObject } from 'graphql-type-json'
 
