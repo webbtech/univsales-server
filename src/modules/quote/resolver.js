@@ -62,9 +62,9 @@ const deletePDFs = async (args, cfg) => {
   } catch (e) {
     throw new Error(e)
   }
-  const retObjects = S3Objects.Contents.filter(o => o.Key.indexOf(args.number) > -1)
+  const retObjects = S3Objects.Contents.filter((o) => o.Key.indexOf(args.number) > -1)
   if (!retObjects.length) return false
-  const delObjects = retObjects.map(o => ({ Key: o.Key }))
+  const delObjects = retObjects.map((o) => ({ Key: o.Key }))
 
   // now delete
   const delParams = {
@@ -190,7 +190,7 @@ const searchQuotes = async ({ closed, invoiced, year }) => {
 }
 
 const pdfSignedURL = async (cfg, input, token) => {
-  const payload = Object.assign({}, input)
+  const payload = ramda.clone(input)
   const url = cfg.PDFCreateURLURI
 
   try {
@@ -202,7 +202,7 @@ const pdfSignedURL = async (cfg, input, token) => {
         Authorization: token,
       },
     })
-    return response.json()
+    return await response.json()
   } catch (e) {
     throw new Error(e)
   }
@@ -357,7 +357,7 @@ const quoteNearbyJobs = async (input) => {
   return addresses
 }
 
-const quotePersist = async (input, cfg) => {
+const quotePersist = async (input, cfg, token) => {
   const quote = ramda.clone(input)
   const isNew = !quote._id
 
@@ -374,6 +374,7 @@ const quotePersist = async (input, cfg) => {
   let quoteReturn
   try {
     if (isNew) {
+      // eslint-disable-next-line prefer-object-spread
       const quoteWithDefaults = Object.assign({}, quote, defaults)
       quoteReturn = await Quote.create(quoteWithDefaults)
     } else {
@@ -393,7 +394,16 @@ const quotePersist = async (input, cfg) => {
     docType: 'quote',
   }
   if (!isNew) {
-    await savePDF(pdfArgs, cfg)
+    try {
+      const ret = await savePDF(pdfArgs, cfg, token)
+      // we only want to return error
+      if (typeof ret === 'object') {
+        console.info('ret on savePDF in resolver:', ret) // eslint-disable-line no-console
+        return ret
+      }
+    } catch (e) {
+      throw new Error(e)
+    }
   }
   console.info('Successfully saved quote with id: ', quoteReturn._id) // eslint-disable-line no-console
   return quoteReturn
@@ -437,7 +447,7 @@ const quoteRemove = async (id, cfg) => {
   }
 }
 
-const createInvoice = async (id, cfg) => {
+const createInvoice = async (id, cfg, token) => {
   let quote
   try {
     quote = await Quote.findById(id)
@@ -450,12 +460,32 @@ const createInvoice = async (id, cfg) => {
     quoteID: id,
     docType: 'invoice',
   }
-  await savePDF(pdfArgs, cfg)
+  try {
+    const ret = await savePDF(pdfArgs, cfg, token)
+    // we only want to return error
+    if (typeof ret === 'object') {
+      console.info('ret on savePDF in resolver:', ret) // eslint-disable-line no-console
+      return ret
+    }
+  } catch (e) {
+    throw new Error(e)
+  }
+
+  // Save worksheet
   const wrkShtArgs = {
     quoteID: id,
     docType: 'invoice',
   }
-  saveWrkShtPDF(wrkShtArgs, cfg)
+  try {
+    const ret = await saveWrkShtPDF(wrkShtArgs, cfg, token)
+    // we only want to return error
+    if (typeof ret === 'object') {
+      console.info('ret on saveWrkShtPDF in resolver:', ret) // eslint-disable-line no-console
+      return ret
+    }
+  } catch (e) {
+    throw new Error(e)
+  }
 
   return Quote.findOneAndUpdate(
     { _id: mongoose.Types.ObjectId(id) },
@@ -493,8 +523,8 @@ export const resolvers = {
     quoteNearbyJobs: (_, { input }) => quoteNearbyJobs(input),
   },
   Mutation: {
-    createInvoice: (_, { id }, { cfg }) => createInvoice(id, cfg),
-    quotePersist: (_, { input }, { cfg }) => quotePersist(input, cfg),
+    createInvoice: (_, { id }, { cfg, token }) => createInvoice(id, cfg, token),
+    quotePersist: (_, { input }, { cfg, token }) => quotePersist(input, cfg, token),
     quotePersistDiscount: (_, { input }) => quotePersistDiscount(input),
     quoteRemove: (_, { id }, { cfg }) => quoteRemove(id, cfg),
   },

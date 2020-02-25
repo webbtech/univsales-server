@@ -5,34 +5,37 @@ Transform: AWS::Serverless-2016-10-31
 Description: Universal API Lambda Graphql Server
 
 Parameters:
+  ParamCertificateArn:
+    Description: Domain Certificate Arn
+    Type: String
+  ParamCustomDomainName:
+    Description: Custom Domain Name
+    Type: String
+  ParamENV:
+    Description: Stage environment
+    Type: String
+  ParamHostedZoneId:
+    Description: Hosted Zone ID
+    Type: String
+  ParamKMSKeyID:
+    Description: KMS key id
+    Type: String
   ParamProjectName:
     Type: String
     Description: Name of the API - used to generate unique names for resources
     MinLength: 3
     MaxLength: 20
     AllowedPattern: '^[a-zA-Z][a-zA-Z0-9_-]*$'
-  ParamAccountId:
-    Type: String
-    Description: Account ID
-  ParamSSMPath:
-    Type: String
-    Description: Second path part in ssmParams
-    Default: univsales-api
-  ParamENV:
-    Type: String
-  ParamKMSKeyID:
-    Description: KMS key id
-    Type: String
-  ParamThundraKey:
-    Description: thundra.io API key
-    Type: String
 
 Resources:
   Api:
     Type: AWS::Serverless::Api
+    DeletionPolicy: Delete
+    DependsOn: Lambda
     Properties:
+      EndpointConfiguration: REGIONAL
       StageName: Prod
-      Cors: "'*'"
+
       # see link for (apparently) undocumented Auth properties
       # link: https://awsdevelopers.slack.com/archives/CA18Q1ZCM/p1560266323067200
       Auth:
@@ -42,6 +45,30 @@ Resources:
             FunctionArn: !GetAtt AuthLambda.Arn
             Identity:
               ReauthorizeEvery: 300
+              # ReauthorizeEvery: 1
+      
+      # Documentation for below: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#gateway-response-object
+      GatewayResponses:
+        UNAUTHORIZED:
+          StatusCode: 401
+          ResponseTemplates:
+            "application/json": '{ "message": $context.error.messageString }'
+          ResponseParameters:
+            Headers:
+              Access-Control-Expose-Headers: "'WWW-Authenticate'"
+              Access-Control-Allow-Origin: "'*'"
+              Access-Control-Allow-Headers: "'*'"
+
+      # Docs for this at: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#domain-configuration-object
+      Domain:
+        DomainName: !Ref ParamCustomDomainName
+        CertificateArn: !Ref ParamCertificateArn
+        EndpointConfiguration: "REGIONAL"
+        Route53:
+          HostedZoneId: !Ref ParamHostedZoneId
+          EvaluateTargetHealth: true
+          DistributionDomainName:
+            Value: !Sub "https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
 
   Lambda:
     Type: AWS::Serverless::Function
@@ -55,11 +82,8 @@ Resources:
       Tracing: Active
       Environment:
         Variables:
-          NODE_ENV: prod
-          Stage: prod
-          thundra_apiKey: !Ref ParamThundraKey
-          # thundra_agent_lambda_report_cloudwatch_enable: true
-          # thundra_lambda_warmup_warmupAware: true
+          NODE_ENV: !Ref ParamENV
+          Stage: !Ref ParamENV
       Events:
         GraphqlRequest:
           Type: Api
@@ -101,11 +125,8 @@ Resources:
       CodeUri: build/
       Handler: authorizer/index.handler
       Runtime: nodejs10.x
-      Environment:
-        Variables:
-          thundra_apiKey: !Ref ParamThundraKey
-          thundra_agent_lambda_report_cloudwatch_enable: true
-          thundra_lambda_warmup_warmupAware: true
+      MemorySize: 256
+      Tracing: Active
 
   LambdaRole:
     Type: AWS::IAM::Role
@@ -155,7 +176,7 @@ Resources:
           - Action:
             - ssm:GetParametersByPath
             Effect: Allow
-            Resource: !Sub arn:aws:ssm:${AWS::Region}:${ParamAccountId}:parameter/${ParamENV}/${ParamSSMPath}*
+            Resource: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${ParamENV}/univsales-api*
       - PolicyName: FunctionKMSAccess
         PolicyDocument:
           Version: '2012-10-17'
@@ -164,7 +185,7 @@ Resources:
             Action:
             - kms:Decrypt
             - kms:DescribeKey
-            Resource: !Sub arn:aws:kms:${AWS::Region}:${ParamAccountId}:key/${ParamKMSKeyID}
+            Resource: !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/${ParamKMSKeyID}
       - PolicyName: FunctionVPCAccess
         PolicyDocument:
           Version: 2012-10-17
@@ -180,15 +201,15 @@ Outputs:
   ApiId:
     Description: "API ID"
     Value: !Ref Api
-
   ApiUrl:
     Description: "API endpoint URL for Prod environment"
     Value: !Sub 'https://${Api}.execute-api.${AWS::Region}.amazonaws.com/Prod/'
-
   LambdaARN:
     Description: The Lambda Arn
     Value: !GetAtt Lambda.Arn
-
   AuthLambdaARN:
     Description: The Authorization Lambda Arn
     Value: !GetAtt AuthLambda.Arn
+  DomainInvokeURL:
+    Description: "Domain Invoke URL"
+    Value: !Sub "https://${ParamCustomDomainName}"

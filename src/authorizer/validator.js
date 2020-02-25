@@ -1,67 +1,55 @@
 import jose from 'node-jose'
+import jwt from 'jsonwebtoken'
+
 import jwtSet from './jwks.json'
 
 const validator = async (clientID, token) => {
   if (!clientID) {
-    return {
-      status: null,
-      error: new Error('Missing clientID'),
-    }
+    throw new Error('Missing clientID')
   }
   if (!token) {
-    return {
-      status: null,
-      error: new Error('Missing token'),
-    }
+    throw new Error('Missing token')
   }
 
+  let keyStore = jose.JWK.createKeyStore(jwtSet)
 
-  const { keys } = jwtSet
-  const sections = token.split('.')
-  // get the kid from the headers prior to verification
-  let header = jose.util.base64url.decode(sections[0])
-  header = JSON.parse(header)
-  const { kid } = header
+  const decoded = jwt.decode(token, { complete: true })
+  const { kid } = decoded.header
 
-  let keyIdx = -1
-  for (let i = 0; i < keys.length; i += 1) {
-    if (kid === keys[i].kid) {
-      keyIdx = i
-      break
-    }
-  }
-  if (keyIdx === -1) {
-    return {
-      status: null,
-      error: new Error('Public key not found in jwks.json'),
-    }
+  try {
+    keyStore = await jose.JWK.asKeyStore(jwtSet)
+  } catch (err) {
+    throw new Error(err)
   }
 
-  const keyRes = await jose.JWK.asKey(keys[keyIdx])
+  const key = keyStore.get(kid, { kty: 'RSA' })
 
   // verify the signature
-  const verifyRes = await jose.JWS.createVerify(keyRes).verify(token)
+  const verifyRes = await jose.JWS.createVerify(key).verify(token)
 
   // extract claims
   const claims = JSON.parse(verifyRes.payload)
 
+  const tokenClientID = claims.aud || claims.client_id
+  const username = claims['cognito:username'] || claims.username
+  if (!tokenClientID || !username) {
+    throw new Error('Failed to set either tokenClientID or username')
+  }
+  if (tokenClientID !== clientID) {
+    // eslint-disable-next-line no-console
+    console.log('failed to match tokenClientID to clientID: ', tokenClientID, clientID)
+    throw new Error('Token was not issued for this audience')
+  }
+
   // ensure token is not expired
   const currentTs = Math.floor(new Date() / 1000)
   if (currentTs > claims.exp) {
-    return {
-      status: 'unauthorized',
-      error: new Error('Token is expired'),
-    }
+    throw new Error('Token is expired')
   }
 
-  // check that clientID matches
-  if (claims.client_id !== clientID) {
-    return {
-      status: 'deny',
-      error: new Error('Token was not issued for this audience'),
-    }
-  }
-  return { status: 'allow', error: null }
+  const principalID = `${username}|${tokenClientID}`
+
+  return principalID
 }
 
 export default validator

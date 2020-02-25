@@ -92,8 +92,8 @@ const searchByAddress = async ({ search }) => {
   } catch (e) {
     throw new Error(e)
   }
-  const ids = addresses.map(a => a.customerID)
-  const customerIDs = ramda.uniq(ids).map(c => mongoose.Types.ObjectId(c))
+  const ids = addresses.map((a) => a.customerID)
+  const customerIDs = ramda.uniq(ids).map((c) => mongoose.Types.ObjectId(c))
 
   const customers = await Customer.find({ _id: { $in: customerIDs } }).sort({ 'name.last': 1 })
   customers.forEach((c) => {

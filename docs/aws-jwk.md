@@ -7,4 +7,4 @@ region: 'ca-central-1',
 userPoolId: 'ca-central-1_1DQjnU6jd',
 
 format: https://cognito-idp.{region}.amazonaws.com/{userPoolId}/.well-known/jwks.json  
-do: wget https://cognito-idp.ca-central-1.amazonaws.com/ca-central-1_1DQjnU6jd/.well-known/jwks.json > outputFile
+do: /usr/local/bin/wget https://cognito-idp.ca-central-1.amazonaws.com/ca-central-1_1DQjnU6jd/.well-known/jwks.json > outputFile

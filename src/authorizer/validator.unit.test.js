@@ -1,26 +1,62 @@
 /* cSpell:disable */
-// to test, use: yarn test:w ./src/authorizer
+/**
+ * Docs for libs are:
+ * jose: https://github.com/cisco/node-jose
+ * jsonwebtoken: https://github.com/auth0/node-jsonwebtoken
+ * to test, use: yarn test:w ./src/authorizer/validator.unit.test.js
+ */
 
 import validator from './validator'
 
-const expiredToken = 'eyJraWQiOiJiT0M3eWRkS2hleXZGVnp3VlNsczVPd1JTbENySHF3TzA3RHlGUVBiMk9JPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI4MDYzNjY0Mi0zZTcxLTRjNTctOWQ2MS02YmYwNzFiYjg5ZTEiLCJjb2duaXRvOmdyb3VwcyI6WyJhZG1pbiJdLCJ0b2tlbl91c2UiOiJhY2Nlc3MiLCJzY29wZSI6ImF3cy5jb2duaXRvLnNpZ25pbi51c2VyLmFkbWluIiwiYXV0aF90aW1lIjoxNTYwOTY3NDg1LCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAuY2EtY2VudHJhbC0xLmFtYXpvbmF3cy5jb21cL2NhLWNlbnRyYWwtMV8xRFFqblU2amQiLCJleHAiOjE1NjEwNDMwNjYsImlhdCI6MTU2MTAzOTQ2NiwianRpIjoiY2I4ODI4MmUtMzE3OC00ZGJiLWJlOGEtYmNkYzJiYTliNDI3IiwiY2xpZW50X2lkIjoiMjA3NWtiYmJiM2hhZG10YWxlZGNuY2ZiazAiLCJ1c2VybmFtZSI6InB1bHBmcmVlIn0.f-PmXyLsfC0sX9t4Oj7AyZmlGjX0J2crCM1wfEQ_AcuWniW9y_QUGrrWdefWjcSXpsvNUg-ZjMPmTyHKuVlsi9B44fbpg_nX1oZODgzXqP_IeoJ0TwvXU1eWVOG-CGO6ktaRYn1WqNQqr1XIoV5BoDapYQjO64kYdmaK3_6Xz9QBi4PrZ3TCzA8tlNik5zZcsy1VAzlCqyuNPTu662R8228I65f48pJr1FoZbTQk7bFIp9CiPl6cJLRCALNcaI2AbWquqpY_nWUOMClfppeoz3rE0u3pa_PBNRVAoO1PIpU_SRdaw1DmxagFLz5XSr5uFv0TV0jlGkLs_wWo92Ek3Q'
-// note: require a fresh token here to properly test
-const token = 'eyJraWQiOiJiT0M3eWRkS2hleXZGVnp3VlNsczVPd1JTbENySHF3TzA3RHlGUVBiMk9JPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI4MDYzNjY0Mi0zZTcxLTRjNTctOWQ2MS02YmYwNzFiYjg5ZTEiLCJjb2duaXRvOmdyb3VwcyI6WyJhZG1pbiJdLCJ0b2tlbl91c2UiOiJhY2Nlc3MiLCJzY29wZSI6ImF3cy5jb2duaXRvLnNpZ25pbi51c2VyLmFkbWluIiwiYXV0aF90aW1lIjoxNTYwOTY3NDg1LCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAuY2EtY2VudHJhbC0xLmFtYXpvbmF3cy5jb21cL2NhLWNlbnRyYWwtMV8xRFFqblU2amQiLCJleHAiOjE1NjEwNjc0MzksImlhdCI6MTU2MTA2MzgzOSwianRpIjoiNDE2NGYzNjMtNjRiOS00NDE5LWI5ZjYtNDlmNjgzYmRhNGY4IiwiY2xpZW50X2lkIjoiMjA3NWtiYmJiM2hhZG10YWxlZGNuY2ZiazAiLCJ1c2VybmFtZSI6InB1bHBmcmVlIn0.Xfgg-wJdKr6MtLdaqW1ez5yUnkklilvWOz_GnDWpxEEYnl7Ib3ej01vhFbkqZUFYW9YCCKSnvjQePnjcu7J8pnmI3sVBTXIFcPBdJ07KjwCFF0G7PTCv09ts6haH7BtUExRligJuyiqh1L3mWy_gh94980aSLr7MCwZcMiZi8BfuhlkeFqTp12YaLbpVIiTxQFze5xw_U539EReQRgxoK6cvPvDPCeCZimLeJ1mxWubnZak1u_6t3VvuIHCEMydGmFROBBs10-jKnUlooKGZPJvhg8TQKduMBQVFcKDt3QcF5LMbXdQWlHcfZoEyKApuvXaHl-RwE1KTabi0mPMp_Q'
-const clientID = '2075kbbbb3hadmtaledcncfbk0'
-const invalidClientID = '2075kbbbb3hadmtaledcncfbk9'
+import { COGNITO_CLIENT_ID as clientID } from './constants'
 
+// eslint-disable-next-line quotes
+const token = "eyJraWQiOiJGSEt3RW8yZkZKWFVUQjVTUjcwbjZQOGR2R2R2T216SWZ1cXBQV3ZXcU53PSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI4MDYzNjY0Mi0zZTcxLTRjNTctOWQ2MS02YmYwNzFiYjg5ZTEiLCJjb2duaXRvOmdyb3VwcyI6WyJhZG1pbiJdLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiaXNzIjoiaHR0cHM6XC9cL2NvZ25pdG8taWRwLmNhLWNlbnRyYWwtMS5hbWF6b25hd3MuY29tXC9jYS1jZW50cmFsLTFfMURRam5VNmpkIiwicGhvbmVfbnVtYmVyX3ZlcmlmaWVkIjp0cnVlLCJjb2duaXRvOnVzZXJuYW1lIjoicHVscGZyZWUiLCJhdWQiOiIyMDc1a2JiYmIzaGFkbXRhbGVkY25jZmJrMCIsImV2ZW50X2lkIjoiYzU4MzM1NzYtOGZlYy00MmYyLTkwYjEtNzY1NmNiMWE2NzRiIiwidG9rZW5fdXNlIjoiaWQiLCJhdXRoX3RpbWUiOjE1ODIxNTEwODIsIm5hbWUiOiJSb24gRHljayIsInBob25lX251bWJlciI6IisxOTA1OTg0OTM5MyIsImV4cCI6MTU4MjMwNjAzOCwiaWF0IjoxNTgyMzAyNDM4LCJlbWFpbCI6InJvbmRAd2ViYnRlY2gubmV0In0.PDsHqHHQb7b1r3YuvB8p0Dc_ZXOEwEWUJ19jwSNb6VoEwYMRkhfHaJaAB5xoagwO55gFQi-cj9pg9CfnNlK93NXqTqehnP7eg2cBRXE-qIa-7cX5VW559l4v7jC6o6FvR59gWRns2xjkg7ZDJ6htoSKgiYW5QbmUBcvBK38BqYz5y9ShU2lDRB5rx9jjNMID04Z96_J8M2N-OQenLplA1sJdI0zjjmh8CdYkrkp_G8byYaaP_5igesfmOaG0s5EElB7rgKUTtttfR8q8fxz8DBeArhuk_3uA-lrl3zqz8wxMO0mx02DdxFvK0PrDUJTKYf36Rexfq5M6ah3IVre2fw"
+const expiredToken = 'eyJraWQiOiJGSEt3RW8yZkZKWFVUQjVTUjcwbjZQOGR2R2R2T216SWZ1cXBQV3ZXcU53PSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI4MDYzNjY0Mi0zZTcxLTRjNTctOWQ2MS02YmYwNzFiYjg5ZTEiLCJjb2duaXRvOmdyb3VwcyI6WyJhZG1pbiJdLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiaXNzIjoiaHR0cHM6XC9cL2NvZ25pdG8taWRwLmNhLWNlbnRyYWwtMS5hbWF6b25hd3MuY29tXC9jYS1jZW50cmFsLTFfMURRam5VNmpkIiwicGhvbmVfbnVtYmVyX3ZlcmlmaWVkIjp0cnVlLCJjb2duaXRvOnVzZXJuYW1lIjoicHVscGZyZWUiLCJhdWQiOiIyMDc1a2JiYmIzaGFkbXRhbGVkY25jZmJrMCIsImV2ZW50X2lkIjoiYzU4MzM1NzYtOGZlYy00MmYyLTkwYjEtNzY1NmNiMWE2NzRiIiwidG9rZW5fdXNlIjoiaWQiLCJhdXRoX3RpbWUiOjE1ODIxNTEwODIsIm5hbWUiOiJSb24gRHljayIsInBob25lX251bWJlciI6IisxOTA1OTg0OTM5MyIsImV4cCI6MTU4MjIzMjM0MCwiaWF0IjoxNTgyMjI4NzQwLCJlbWFpbCI6InJvbmRAd2ViYnRlY2gubmV0In0.moXgKaE4ZBZpkYuzy2NbVDQvIlnz4LETUOnzvIV2PdkAmFDGVVCxfXE8wPHlJC4v4Wu5b3xnHAb7pchAmhrW5EeGUUAofGpRPtp70FO_HD7ooDPhrn5SJh6415zZ4SyBTek1N8_-cxtScOlwO0eBLu35U6YYManiliJzubzTP_f-6plC61n5hFEzrO16G1VxKvAI3YzSvTd4q678AVFjlVBFz0R3ElLqc-Qa3t7aCtaWtCeglj8mKvGP17PyV488CuZG9pB652EINvFKEL1AY0CkAg0-CeCzz9rtgjWOchzG9ckvT9opibJYOIHRKtumC8eKgRGRBLan3_8XifobAw'
 
-test('authCheck expired token', async () => {
-  const res = await validator(clientID, expiredToken)
-  expect(res.status).toEqual('unauthorized')
-})
-
-test('authCheck invalid clientID', async () => {
-  const res = await validator(invalidClientID, token)
-  expect(res.status).toEqual('deny')
-})
-
-test('authCheck allow', async () => {
+test('has correct return', async () => {
   const res = await validator(clientID, token)
-  expect(res.status).toEqual('allow')
+  expect(res).toContain(clientID)
+})
+
+test('token has expired', async () => {
+  let thrownError
+  try {
+    await validator(clientID, expiredToken)
+  } catch (err) {
+    thrownError = err
+  }
+  expect(thrownError).toEqual(expect.any(Error))
+  expect(thrownError).toMatchObject({ message: 'Token is expired' })
+})
+
+test('validate has missing params', async () => {
+  let thrownError
+  try {
+    await validator(null, token)
+  } catch (err) {
+    thrownError = err
+  }
+  expect(thrownError).toEqual(expect.any(Error))
+  expect(thrownError).toMatchObject({ message: 'Missing clientID' })
+
+  try {
+    await validator(clientID)
+  } catch (err) {
+    thrownError = err
+  }
+  expect(thrownError).toEqual(expect.any(Error))
+  expect(thrownError).toMatchObject({ message: 'Missing token' })
+})
+
+test('has invalid client id', async () => {
+  const invalidClientID = '5n63nd473pv7ne2qskv30gkcbh'
+  let thrownError
+  try {
+    await validator(invalidClientID, token)
+  } catch (err) {
+    thrownError = err
+  }
+  expect(thrownError).toEqual(expect.any(Error))
+  expect(thrownError).toMatchObject({ message: 'Token was not issued for this audience' })
 })

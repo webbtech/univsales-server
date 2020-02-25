@@ -12,9 +12,8 @@ buildapp:
 	cp ./src/authorizer/jwks.json build/authorizer/ && \
 	cd ./build && \
 	rm index.js && \
-	yarn install --prod && \
-	find . -mtime +10950 -print -exec touch {} \;
-
+	yarn install --prod
+	
 compileapp:
 	yarn run build
 
@@ -38,22 +37,23 @@ awsDeploy:
 	@aws cloudformation deploy \
    --template-file ${FILE_PACKAGE} \
    --region $(AWS_REGION) \
-   --stack-name $(AWS_STACK_NAME) \
+   --stack-name $(PROJECT_NAME) \
    --capabilities CAPABILITY_NAMED_IAM \
    --profile $(AWS_PROFILE) \
    --force-upload \
 	 --parameter-overrides \
-	 		ParamAccountId=$(AWS_ACCOUNT_ID) \
-	 	  ParamProjectName=$(AWS_STACK_NAME) \
+	 		ParamCertificateArn=$(CERTIFICATE_ARN) \
+			ParamCustomDomainName=$(CUSTOM_DOMAIN_NAME) \
 			ParamENV=$(ENV) \
-			ParamAppBucket=$(APP_BUCKET_NAME) \
+			ParamHostedZoneId=$(HOSTED_ZONE_ID) \
 			ParamKMSKeyID=$(KMS_KEY_ID) \
-			ParamThundraKey=$(THUNDRA_API_KEY)
+			ParamProjectName=$(PROJECT_NAME) \
+			ParamStorageBucket=$(AWS_STORAGE_BUCKET)
 
 describe:
 	@aws cloudformation describe-stacks \
 		--region $(AWS_REGION) \
-		--stack-name $(AWS_STACK_NAME)
+		--stack-name $(PROJECT_NAME)
 
 outputs:
 	@ make describe \

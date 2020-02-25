@@ -9,6 +9,6 @@ PDFCreateURLURI: ''
 PDFSaveURI: ''
 PDFWrkShtSaveURI: ''
 s3Bucket: 'ca-universalwindows'
-ssmPath: 'univsales-api'
+ssmPath: 'univsales-api2'
 nodeEnv: 'prod'
 usessm: true

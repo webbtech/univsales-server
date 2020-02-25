@@ -5,7 +5,7 @@ import mongoose from './mongo/connect'
 
 import schema from './schema'
 
-const thundra = require('@thundra/core')()
+// const thundra = require('@thundra/core')()
 
 let cfg
 let db
@@ -35,10 +35,10 @@ server.context = context
   },
 }) */
 
-exports.graphqlHandler = thundra(server.createHandler({
+exports.graphqlHandler = server.createHandler({
   cors: {
     origin: '*',
     credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization', 'Access-Control-Allow-Origin'],
+    // allowedHeaders: ['Content-Type', 'Authorization', 'Access-Control-Allow-Origin'],
   },
-}))
+})

@@ -8,6 +8,7 @@
   "private": false,
   "dependencies": {
     "@thundra/core": "2.8.1",
+    "apollo-server": "2.9.16",
     "apollo-server-lambda": "2.9.16",
     "aws-sdk": "2.611.0",
     "graphql": "14.6.0",
@@ -22,7 +23,6 @@
     "ramda": "0.27.0"
   },
   "devDependencies": {
-    "apollo-server": "2.9.16",
     "apollo-server-testing": "2.9.16",
     "babel-cli": "6.26.0",
     "babel-preset-env": "1.7.0",

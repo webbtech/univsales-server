@@ -1,29 +1,43 @@
 import fetch from 'node-fetch'
 
-export async function savePDF(args, cfg) {
+export async function savePDF(args, cfg, token) {
   const url = cfg.PDFSaveURI
   try {
-    await fetch(url, {
-      method: 'post',
+    const ret = await fetch(url, {
+      method: 'POST',
       body: JSON.stringify(args),
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token,
+      },
     })
+    if (ret.status !== 201) {
+      return new Error(`Save quote PDF failed - ${ret.status} error with message: ${ret.statusText}`)
+    }
   } catch (e) {
     throw new Error(e)
   }
+  return true
 }
 
-export async function saveWrkShtPDF(args, cfg) {
+export async function saveWrkShtPDF(args, cfg, token) {
   const url = cfg.PDFWrkShtSaveURI
   try {
-    await fetch(url, {
+    const ret = await fetch(url, {
       method: 'post',
       body: JSON.stringify(args),
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token,
+      },
     })
+    if (ret.status !== 201) {
+      return new Error(`Save Worksheet PDF failed - ${ret.status} error with message: ${ret.statusText}`)
+    }
   } catch (e) {
     throw new Error(e)
   }
+  return true
 }
 
 export function phoneRegex(phone) {
