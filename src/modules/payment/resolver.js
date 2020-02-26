@@ -56,7 +56,7 @@ const find = async (quoteID) => {
   }
 }
 
-const paymentPersist = async (input, cfg) => {
+const paymentPersist = async (input, cfg, token) => {
   let paymentReturn
   const { quoteID } = input
 
@@ -74,15 +74,26 @@ const paymentPersist = async (input, cfg) => {
     throw new Error(e)
   }
   await updateQuotePayment(paymentReturn.quoteID)
+
+  // Save PDF
   const pdfArgs = {
     quoteID,
     docType: 'invoice',
   }
-  savePDF(pdfArgs, cfg)
+  try {
+    const ret = await savePDF(pdfArgs, cfg, token)
+    // we only want to return error
+    if (typeof ret === 'object') {
+      console.info('ret on savePDF in resolver:', ret) // eslint-disable-line no-console
+      return ret
+    }
+  } catch (e) {
+    throw new Error(e)
+  }
   return paymentReturn
 }
 
-const paymentRemove = async (id, cfg) => {
+const paymentRemove = async (id, cfg, token) => {
   let paymentReturn
 
   // fetch payment
@@ -96,11 +107,23 @@ const paymentRemove = async (id, cfg) => {
     throw new Error(e)
   }
   await updateQuotePayment(quoteID)
+
+  // Save PDF
   const pdfArgs = {
     quoteID,
     docType: 'invoice',
   }
-  savePDF(pdfArgs, cfg)
+  try {
+    const ret = await savePDF(pdfArgs, cfg, token)
+    // we only want to return error
+    if (typeof ret === 'object') {
+      console.info('ret on savePDF in resolver:', ret) // eslint-disable-line no-console
+      return ret
+    }
+  } catch (e) {
+    throw new Error(e)
+  }
+
   return paymentReturn
 }
 
@@ -109,7 +132,7 @@ export const resolvers = {
     payments: (_, { quoteID }) => find(quoteID),
   },
   Mutation: {
-    paymentPersist: (_, { input }, { cfg }) => paymentPersist(input, cfg),
-    paymentRemove: (_, { id }, { cfg }) => paymentRemove(id, cfg),
+    paymentPersist: (_, { input }, { cfg, token }) => paymentPersist(input, cfg, token),
+    paymentRemove: (_, { id }, { cfg, token }) => paymentRemove(id, cfg, token),
   },
 }
