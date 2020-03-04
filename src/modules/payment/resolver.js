@@ -49,7 +49,7 @@ const updateQuotePayment = async (quoteID) => {
 
 const find = async (quoteID) => {
   try {
-    const payments = await Payment.find({ quoteID }).sort({ updatedAt: -1 })
+    const payments = await Payment.find({ quoteID }).sort({ updatedAt: 1 })
     return payments
   } catch (e) {
     throw new Error(e)

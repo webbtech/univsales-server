@@ -82,9 +82,12 @@ const searchByField = async ({ field, value, active }) => {
 /*
   Search by jobsheet associated address
 */
-const searchByAddress = async ({ search }) => {
+const searchByAddress = async ({ value }) => {
+  if (!value) {
+    throw new Error('Missing value in searchByAddress')
+  }
   const q = {}
-  q.street1 = new RegExp(`^[0-9]+\\s${search}`, 'i')
+  q.street1 = new RegExp(`^[0-9]+\\s${value}`, 'i')
   q.associate = 'jobsheet'
   let addresses
   try {
@@ -210,16 +213,12 @@ export const resolvers = {
     searchCustomer: (_, {
       active = true,
       field,
-      search,
       value,
     }) => {
-      if (field && field.length && value && value.length) {
-        return searchByField({ field, value, active })
+      if (field === 'address') {
+        return searchByAddress({ value })
       }
-      if (search && search.length) {
-        return searchByAddress({ search })
-      }
-      return false
+      return searchByField({ field, value, active })
     },
   },
   Mutation: {

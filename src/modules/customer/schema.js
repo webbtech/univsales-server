@@ -9,9 +9,9 @@ extend type Mutation {
 }
 extend type Query {
   customer(customerID: ID!): Customer
-  searchCustomer(active: Boolean, field: String, search: String, value: String): [Customer]
-  # searchCustomerRecent: [QuoteRecent]
+  searchCustomer(active: Boolean, field: String, value: String): [Customer]
 }
+
 type Customer {
   _id: ID!
   active: Boolean!

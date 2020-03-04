@@ -41,9 +41,12 @@ export async function saveWrkShtPDF(args, cfg, token) {
 }
 
 export function phoneRegex(phone) {
+  if (phone.length < 3) return false
+
   const regex = /\(?(\d{3})\)?\s?(\d{3})?-?(\d{4})?/
   const res = phone.match(regex)
   let retPhone = ''
+
   if (res[3] !== undefined) {
     retPhone = `^\\(${res[1]}\\) ${res[2]}-${res[3]}$`
   } else if (res[2] !== undefined) {

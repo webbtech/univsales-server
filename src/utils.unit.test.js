@@ -16,3 +16,10 @@ test('extract phone formatted', () => {
 
   expect(res).toEqual('^\\(905\\) 734-1164$')
 })
+
+test('length less than 3', () => {
+  const phone = '90'
+  const res = utils.phoneRegex(phone)
+
+  expect(res).toBe(false)
+})
