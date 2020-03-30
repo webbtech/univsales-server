@@ -52,6 +52,7 @@ const jobSheetWindowSchema = new Schema(
     specs: {
       installType: String,
       options: String,
+      optionsDoc: Object,
       overSize: { default: null, type: Number },
       sqft: Number,
       trim: String,

@@ -2,6 +2,7 @@ import { gql } from 'apollo-server-lambda'
 
 export default gql`
 extend type Mutation {
+  jobSheetDuplicate(id: ID!): JobSheet
   jobSheetPersist(addressInput: AddressInput, jobSheetInput: JobSheetInput!): JobSheet
   jobSheetPersistFeatures(features: String!, id: ID!): JobSheet
   jobSheetPersistGroup(input: GroupInput!): JobSheetGroup
@@ -51,6 +52,7 @@ type GroupWindowDims {
 type JobSheet {
   _id: ID!
   addressID: Address
+  duplicateNumber: Int
   createdAt: String
   customerID: Customer
   features: String
@@ -110,6 +112,7 @@ type JobSheetGroupSpecs {
   groupTypeDescription: String
   installType: String
   options: String
+  optionsDoc: OptionsDoc
   sqft: Int
   style: String
   trim: String
@@ -162,6 +165,7 @@ type JobSheetWindowDims {
 type JobSheetWindowSpecs {
   installType: String
   options: String
+  optionsDoc: OptionsDoc
   overSize: Int
   sqft: Int
   trim: String
@@ -184,6 +188,13 @@ type WindowDims {
   overSize: Int
   round: Int
   underSize: Int
+}
+
+type OptionsDoc {
+  color: String
+  customColor: String,
+  darker: Boolean,
+  window: [String],
 }
 
 #
@@ -256,6 +267,7 @@ input GroupSpecsInput {
   groupTypeDescription: String
   installType: String
   options: String
+  optionsDoc: OptionsDocInput
   sqft: Int
   style: String
   trim: String
@@ -330,8 +342,16 @@ input WindowSpecsInput {
   extendSqft: Int
   installType: String
   options: String
+  optionsDoc: OptionsDocInput
   overSize: Int
   sqft: Int
   trim: String
+}
+
+input OptionsDocInput {
+  color: String
+  customColor: String,
+  darker: Boolean,
+  window: [String],
 }
 `

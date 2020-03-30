@@ -7,7 +7,6 @@ import JobSheet from './model'
 import JobSheetGroup from '../jobSheetGroup/model'
 import JobSheetWindow from '../jobSheetWindow/model'
 import JobSheetOther from '../jobSheetOther/model'
-// import Product from '../product/model'
 import Quote from '../quote/model'
 import QuoteMeta from '../quote/metaModel'
 
@@ -52,23 +51,98 @@ const jobSheetData = async (jobSheetID) => {
     })
   })
 
-  // TODO: check if we need this here, I suspect not required and using overhead
-  /* const products = await Product.find({ _id: { $in: productIDs } })
-  sheet.groups.forEach((grp) => {
-    const tmpGrp = grp
-    tmpGrp.items.forEach((item) => {
-      const tmpItem = item
-      tmpItem.product = products.find(p => (
-        p._id.toString() === tmpItem.productID.toString()
-      ))
-    })
-  }) */
-
   return sheet
 }
 
+const jobSheetDuplicate = async (id) => {
+  const jobSheet = {}
+  let newJobSheet
+  let sheet
+  const q = { jobsheetID: id }
+
+  try {
+    sheet = {
+      jobsheet: await JobSheet.findById(id),
+      windows: await JobSheetWindow.find(q),
+      groups: await JobSheetGroup.find(q),
+      other: await JobSheetOther.find(q),
+    }
+  } catch (e) {
+    throw new Error(e)
+  }
+  jobSheet.addressID = sheet.jobsheet.addressID
+  jobSheet.duplicateNumber = sheet.jobsheet.number
+  jobSheet.customerID = sheet.jobsheet.customerID
+  jobSheet.features = sheet.jobsheet.features
+
+  let jsNum
+  try {
+    jsNum = await QuoteMeta.fetchNextJobSheetNum()
+  } catch (e) {
+    throw new Error(e)
+  }
+  jobSheet.number = jsNum.value
+
+  try {
+    newJobSheet = await JobSheet.create(jobSheet)
+  } catch (e) {
+    throw new Error(e)
+  }
+
+  // Now create windows, groups and other
+  const windows = []
+  if (sheet.windows.length) {
+    sheet.windows.forEach((win) => {
+      const winCopy = win.toJSON()
+      delete winCopy._id
+      winCopy.jobsheetID = newJobSheet._id
+      windows.push(JobSheetWindow.create(winCopy))
+    })
+
+    try {
+      await Promise.all(windows)
+    } catch (e) {
+      throw new Error(e)
+    }
+  }
+
+  const groups = []
+  if (sheet.groups.length) {
+    sheet.groups.forEach((win) => {
+      const grpCopy = win.toJSON()
+      delete grpCopy._id
+      grpCopy.jobsheetID = newJobSheet._id
+      groups.push(JobSheetGroup.create(grpCopy))
+    })
+
+    try {
+      await Promise.all(groups)
+    } catch (e) {
+      throw new Error(e)
+    }
+  }
+
+  const other = []
+  if (sheet.other.length) {
+    sheet.other.forEach((win) => {
+      const otherCopy = win.toJSON()
+      delete otherCopy._id
+      otherCopy.jobsheetID = newJobSheet._id
+      other.push(JobSheetOther.create(otherCopy))
+    })
+
+    try {
+      await Promise.all(other)
+    } catch (e) {
+      throw new Error(e)
+    }
+  }
+  // console.log('newJobSheet:', newJobSheet)
+
+  return newJobSheet
+}
+
 const jobSheetPersist = async ({ addressInput, jobSheetInput }) => {
-  let jobSheetReturn
   let addressReturn
   const jobSheet = ramda.clone(jobSheetInput)
 
@@ -97,11 +171,10 @@ const jobSheetPersist = async ({ addressInput, jobSheetInput }) => {
 
   // Now create jobSheet
   try {
-    jobSheetReturn = JobSheet.create(jobSheet)
+    return await JobSheet.create(jobSheet)
   } catch (e) {
     throw new Error(e)
   }
-  return jobSheetReturn
 }
 
 const jobSheetRemove = async (id) => {
@@ -130,11 +203,22 @@ const jobSheetRemove = async (id) => {
     throw new Error(e)
   }
 
-  // delete associated address records
+  // delete associated address record, but... only if not associated with other jobsheets
+  const q = { addressID: jobSh.addressID }
+  let dupSheets
   try {
-    await Address.deleteOne({ _id: jobSh.addressID })
+    dupSheets = await JobSheet.find(q)
   } catch (e) {
     throw new Error(e)
+  }
+
+  const canDelete = dupSheets.length <= 1
+  if (canDelete) {
+    try {
+      await Address.deleteOne({ _id: jobSh.addressID })
+    } catch (e) {
+      throw new Error(e)
+    }
   }
 
   // Start with the windows
@@ -307,6 +391,7 @@ export const resolvers = {
     jobSheetData: (_, { jobSheetID }) => jobSheetData(jobSheetID),
   },
   Mutation: {
+    jobSheetDuplicate: (_, { id }) => jobSheetDuplicate(id),
     jobSheetPersist: (
       _, { addressInput, jobSheetInput },
     ) => jobSheetPersist({ addressInput, jobSheetInput }),

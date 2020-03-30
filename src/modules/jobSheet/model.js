@@ -10,6 +10,7 @@ const jobsheetSchema = new Schema(
     },
     addressID: {
       type: Schema.Types.ObjectId,
+      index: true,
       ref: 'Address',
     },
     features: String,
@@ -18,10 +19,11 @@ const jobsheetSchema = new Schema(
       index: true,
       required: true,
     },
+    duplicateNumber: Number,
   },
   {
     timestamps: true,
-  }
+  },
 )
 
 

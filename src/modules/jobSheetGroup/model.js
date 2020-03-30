@@ -50,6 +50,7 @@ const jobSheetGroupSchema = new Schema(
       },
       installType: String,
       options: String,
+      optionsDoc: Object,
       sqft: Number,
       style: String,
       trim: String,
