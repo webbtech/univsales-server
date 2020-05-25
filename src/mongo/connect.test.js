@@ -3,6 +3,9 @@ import cfg from '../config/config'
 
 let config
 
+// to test just this file, run: yarn test:w src/mongo/connect.test.js
+// to test just this file once, run: yarn test src/mongo/connect.test.js
+
 test('ensure config path', async () => {
   process.env.Stage = 'test'
   config = await cfg.load()
