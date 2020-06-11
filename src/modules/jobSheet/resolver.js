@@ -374,7 +374,7 @@ export const jobSheetRemoveWindow = async (id) => {
     throw new Error(e)
   }
   if (quoteReturn > 0) {
-    throw new Error(`There are ${quoteReturn} quotes using this item.`)
+    throw new Error(`This window cannot be deleted as there are ${quoteReturn} quote(s) associated with this window.`)
   }
 
   try {
