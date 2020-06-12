@@ -194,6 +194,7 @@ type OptionsDoc {
   color: String
   customColor: String,
   darker: Boolean,
+  extraDetails: String,
   window: [String],
 }
 
@@ -352,6 +353,7 @@ input OptionsDocInput {
   color: String
   customColor: String,
   darker: Boolean,
+  extraDetails: String,
   window: [String],
 }
 `
