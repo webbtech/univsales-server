@@ -12,7 +12,7 @@ export async function savePDF(args, cfg, token) {
       },
     })
     if (ret.status !== 201) {
-      return new Error(`Save quote PDF failed - ${ret.status} error with message: ${ret.statusText}`)
+      return new Error(`Save PDF failed - ${ret.status} error with message: ${ret.statusText}`)
     }
   } catch (e) {
     throw new Error(e)

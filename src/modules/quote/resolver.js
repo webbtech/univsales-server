@@ -9,9 +9,14 @@ import Address from '../address/model'
 import Quote from './model'
 import QuoteMeta from './metaModel'
 import { savePDF, saveWrkShtPDF } from '../../utils'
+import { indexOf } from 'lodash'
 
 const LATEST_LIMIT = 100
 const MAX_DISTANCE_DEFAULT = 10000
+
+const DOC_TYPE_QUOTE = 'quote'
+const DOC_TYPE_INVOICE = 'invoice'
+const validDocTypes = [DOC_TYPE_INVOICE, DOC_TYPE_QUOTE]
 
 const defaults = {
   discount: {
@@ -41,45 +46,6 @@ const fetchAddress = async (addressID) => {
     throw new Error(e)
   }
   return address
-}
-
-// todo: nice if there was a way to authenticate without using accessKeyId and screenAccessKey
-const deletePDFs = async (args, cfg) => {
-  const s3 = new AWS.S3({
-    apiVersion: '2006-03-01',
-    accessKeyId: cfg.awsAccessKeyId,
-    secretAccessKey: cfg.awsSecretAccessKey,
-  })
-  const params = {
-    Bucket: cfg.s3Bucket,
-    Prefix: args.docType,
-  }
-
-  // fetch objects and assemble array of objects to delete
-  let S3Objects
-  try {
-    S3Objects = await s3.listObjectsV2(params).promise()
-  } catch (e) {
-    throw new Error(e)
-  }
-  const retObjects = S3Objects.Contents.filter((o) => o.Key.indexOf(args.number) > -1)
-  if (!retObjects.length) return false
-  const delObjects = retObjects.map((o) => ({ Key: o.Key }))
-
-  // now delete
-  const delParams = {
-    Bucket: cfg.s3Bucket,
-    Delete: {
-      Objects: delObjects,
-    },
-  }
-  let delRet
-  try {
-    delRet = await s3.deleteObjects(delParams).promise()
-  } catch (e) {
-    throw new Error(e)
-  }
-  return delRet
 }
 
 const searchByCustomer = async (customerID) => {
@@ -186,25 +152,6 @@ const searchQuotes = async ({ closed, invoiced, year }) => {
     quotes,
     totalInvoiced,
     totalOutstanding,
-  }
-}
-
-const pdfSignedURL = async (cfg, input, token) => {
-  const payload = ramda.clone(input)
-  const url = cfg.PDFCreateURLURI
-
-  try {
-    const response = await fetch(url, {
-      method: 'post',
-      body: JSON.stringify(payload),
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token,
-      },
-    })
-    return await response.json()
-  } catch (e) {
-    throw new Error(e)
   }
 }
 
@@ -509,6 +456,98 @@ const quotePersistDiscount = async (input) => {
   }
 }
 
+// ========== PDF functions ============================================================
+
+const createPDF = async (input, cfg, token) => {
+  if (false === validDocTypes.includes(input.docType)) {
+    throw new Error("Invalid docType requested")
+  }
+  if (false === mongoose.Types.ObjectId.isValid(input.quoteID)) {
+    throw new Error("Invalid quoteID argument")
+  }
+
+  const { quoteID } = input
+  const docType = validDocTypes[validDocTypes.indexOf(input.docType)]
+  const pdfArgs = {
+    quoteID,
+    docType,
+  }
+
+  try {
+    const ret = await savePDF(pdfArgs, cfg, token)
+    // If return is object we likely have error
+    if (typeof ret === 'object') {
+      console.info('ret on savePDF in resolver:', ret) // eslint-disable-line no-console
+      return ret
+    }
+    return {
+      n: 1,
+      ok: ret,
+    }
+  } catch (e) {
+    throw new Error(e)
+  }
+}
+
+// todo: nice if there was a way to authenticate without using accessKeyId and screenAccessKey
+const deletePDFs = async (args, cfg) => {
+  const s3 = new AWS.S3({
+    apiVersion: '2006-03-01',
+    accessKeyId: cfg.awsAccessKeyId,
+    secretAccessKey: cfg.awsSecretAccessKey,
+  })
+  const params = {
+    Bucket: cfg.s3Bucket,
+    Prefix: args.docType,
+  }
+
+  // fetch objects and assemble array of objects to delete
+  let S3Objects
+  try {
+    S3Objects = await s3.listObjectsV2(params).promise()
+  } catch (e) {
+    throw new Error(e)
+  }
+  const retObjects = S3Objects.Contents.filter((o) => o.Key.indexOf(args.number) > -1)
+  if (!retObjects.length) return false
+  const delObjects = retObjects.map((o) => ({ Key: o.Key }))
+
+  // now delete
+  const delParams = {
+    Bucket: cfg.s3Bucket,
+    Delete: {
+      Objects: delObjects,
+    },
+  }
+  let delRet
+  try {
+    delRet = await s3.deleteObjects(delParams).promise()
+  } catch (e) {
+    throw new Error(e)
+  }
+  return delRet
+}
+
+const pdfSignedURL = async (cfg, input, token) => {
+  const payload = ramda.clone(input)
+  const url = cfg.PDFCreateURLURI
+
+  try {
+    const response = await fetch(url, {
+      method: 'post',
+      body: JSON.stringify(payload),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token,
+      },
+    })
+    return await response.json()
+  } catch (e) {
+    throw new Error(e)
+  }
+}
+
+// ========== Resolver Opject =================================================
 export const resolvers = {
   Query: {
     pdfSignedURL: (_, { input }, { cfg, token }) => pdfSignedURL(cfg, input, token),
@@ -524,6 +563,7 @@ export const resolvers = {
   },
   Mutation: {
     createInvoice: (_, { id }, { cfg, token }) => createInvoice(id, cfg, token),
+    createPDF: (_, { input }, { cfg, token }) => createPDF(input, cfg, token),
     quotePersist: (_, { input }, { cfg, token }) => quotePersist(input, cfg, token),
     quotePersistDiscount: (_, { input }) => quotePersistDiscount(input),
     quoteRemove: (_, { id }, { cfg }) => quoteRemove(id, cfg),

@@ -10,6 +10,7 @@ let db
 // const context = async ({ event, req }) => {
 const context = async ({ req }) => {
   const token = req.headers.authorization
+  // console.log('token: ', token)
   // console.log('req:', req.headers.authorization)
   // console.log('req.headers:', c.req.headers)
   // console.log('res:', c.res)

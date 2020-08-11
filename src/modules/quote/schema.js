@@ -3,6 +3,7 @@ import { gql } from 'apollo-server'
 export default gql`
 extend type Mutation {
   createInvoice(id: ID!): Quote
+  createPDF(input: PDFInput!): DBResult
   quotePersist(input: QuoteInput!): Quote
   quotePersistDiscount(input: QuoteDiscountInput!): Quote
   quoteRemove(id: ID!): DBResult
@@ -181,6 +182,11 @@ input ItemsInput {
   group: [String]
   other: [String]
   window: [String]
+}
+
+input PDFInput {
+  quoteID: ID!
+  docType: String
 }
 
 input QuoteDiscountInput {
