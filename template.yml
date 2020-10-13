@@ -26,6 +26,14 @@ Parameters:
     MinLength: 3
     MaxLength: 20
     AllowedPattern: '^[a-zA-Z][a-zA-Z0-9_-]*$'
+  ParamSecurityGroupIds:
+    Description: SecurityGroupIds
+    ConstraintDescription: 'must be list of EC2 security group ids'
+    Type: 'List<AWS::EC2::SecurityGroup::Id>'
+  ParamSubnetIds:
+    Description: SecurityGroupIds
+    ConstraintDescription: 'must be list of EC2 subnet ids'
+    Type: 'List<AWS::EC2::Subnet::Id>'
 
 Resources:
   Api:
@@ -84,6 +92,11 @@ Resources:
         Variables:
           NODE_ENV: !Ref ParamENV
           Stage: !Ref ParamENV
+      VpcConfig:
+        SecurityGroupIds: !Ref ParamSecurityGroupIds
+        SubnetIds: !Ref ParamSubnetIds
+      Tags:
+        BillTo: 'Universal'
       Events:
         GraphqlRequest:
           Type: Api
@@ -105,16 +118,6 @@ Resources:
             Method: OPTIONS
             Auth:
               Authorizer: NONE
-      VpcConfig:
-        # TODO: these should be extracted into params and .env file
-        SecurityGroupIds:
-          - sg-5afb2932
-          - sg-8f6baee7
-        SubnetIds:
-          - subnet-0da8d176
-          - subnet-7f092816
-      Tags:
-        BillTo: 'Universal'
 
   # This function is used in other API's, namely the univsales-pdf-url2 project.
   # If necessary extract into own project, but perhaps not as the other projects
