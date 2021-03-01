@@ -23,14 +23,14 @@ Object {
         "height": Object {
           "__typename": "GroupWindowDims",
           "decimal": 22,
-          "diff": -40,
+          "diff": null,
           "fraction": "",
           "inch": 22,
         },
         "width": Object {
           "__typename": "GroupWindowDims",
           "decimal": 22,
-          "diff": -80,
+          "diff": null,
           "fraction": "",
           "inch": 22,
         },
@@ -134,7 +134,7 @@ Colonial Bars
 2 3/4\\" F.J. Trim
 ",
       },
-      "updatedAt": "1528459333070",
+      "updatedAt": "1582647497225",
     },
   },
   "errors": undefined,

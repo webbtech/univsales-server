@@ -5,11 +5,11 @@ import ramda from 'ramda'
 import fetch from 'node-fetch'
 import AWS from 'aws-sdk'
 
+import { indexOf } from 'lodash'
 import Address from '../address/model'
 import Quote from './model'
 import QuoteMeta from './metaModel'
 import { savePDF, saveWrkShtPDF } from '../../utils'
-import { indexOf } from 'lodash'
 
 const LATEST_LIMIT = 100
 const MAX_DISTANCE_DEFAULT = 10000
@@ -459,11 +459,11 @@ const quotePersistDiscount = async (input) => {
 // ========== PDF functions ============================================================
 
 const createPDF = async (input, cfg, token) => {
-  if (false === validDocTypes.includes(input.docType)) {
-    throw new Error("Invalid docType requested")
+  if (validDocTypes.includes(input.docType) === false) {
+    throw new Error('Invalid docType requested')
   }
-  if (false === mongoose.Types.ObjectId.isValid(input.quoteID)) {
-    throw new Error("Invalid quoteID argument")
+  if (mongoose.Types.ObjectId.isValid(input.quoteID) === false) {
+    throw new Error('Invalid quoteID argument')
   }
 
   const { quoteID } = input
