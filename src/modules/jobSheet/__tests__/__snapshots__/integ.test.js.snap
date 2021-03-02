@@ -97,29 +97,6 @@ Object {
             "groupTypeDescription": "Bow Window 2 Casements, 3 Fixed",
           },
         },
-        Object {
-          "__typename": "JobSheetGroup",
-          "_id": "603d3575869503690158e2b5",
-          "costs": Object {
-            "__typename": "JobSheetGroupCosts",
-            "extendTotal": 1970,
-            "extendUnit": 1970,
-            "install": 775,
-            "installType": 0,
-            "netUnit": 1970,
-            "options": 0,
-            "trim": 0,
-            "windows": 1195,
-          },
-          "qty": 1,
-          "rooms": Array [
-            "LR",
-          ],
-          "specs": Object {
-            "__typename": "JobSheetGroupSpecs",
-            "groupTypeDescription": "2 Double Hungs- 1 Fixed ",
-          },
-        },
       ],
       "jobsheet": Object {
         "__typename": "JobSheet",
@@ -171,28 +148,6 @@ Ok",
             "options": "Pebble Colour",
           },
           "updatedAt": "1582571391922",
-        },
-        Object {
-          "__typename": "JobSheetOther",
-          "_id": "603d3575869503690158e2b8",
-          "costs": Object {
-            "__typename": "OtherCosts",
-            "extendTotal": 825,
-            "extendUnit": 825,
-          },
-          "createdAt": "1614624117165",
-          "description": "Installation of Single S/L Door
-Includes Aluminum Capping",
-          "qty": 1,
-          "rooms": Array [
-            "BR",
-          ],
-          "specs": Object {
-            "__typename": "OtherSpecs",
-            "location": "",
-            "options": "",
-          },
-          "updatedAt": "1614624117165",
         },
       ],
       "windows": Array [

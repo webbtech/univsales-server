@@ -12,7 +12,7 @@ const phoneSchema = new Schema(
     extension: String,
     number: String,
     _id: String,
-  }
+  },
 )
 
 const customerSchema = new Schema(
@@ -27,8 +27,9 @@ const customerSchema = new Schema(
     email: {
       type: String,
       index: true,
-      trim: true,
-      unique: true,
+      // index: { unique: true },
+      // trim: true,
+      // unique: true, // Not able to do unique at this time, as there appears to be an existing duplicate
       // validate: [validateEmail, 'Please enter valid email address'],
       match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email address'],
     },
@@ -61,7 +62,7 @@ const customerSchema = new Schema(
   },
   {
     timestamps: true,
-  }
+  },
 )
 
 const Customer = mongoose.model('Customer', customerSchema)
