@@ -146,6 +146,7 @@ type JobSheetOther {
 
 type JobSheetWindow {
   _id: ID!
+  brickmould: BrickMould
   costs: JobSheetItemCosts
   createdAt: String
   dims: JobSheetWindowDims
@@ -192,10 +193,27 @@ type WindowDims {
 
 type OptionsDoc {
   color: String
-  customColor: String,
-  darker: Boolean,
-  extraDetails: String,
-  window: [String],
+  customColor: String
+  darker: Boolean
+  extraDetails: String
+  window: [String]
+}
+
+type BrickMould {
+  dims: BrickMouldDims
+  size: Int
+  specs: String
+}
+
+type BrickMouldDim {
+  decimal: Float
+  inch: Int
+  fraction: String
+}
+
+type BrickMouldDims {
+  height: BrickMouldDim
+  width: BrickMouldDim
 }
 
 #
@@ -351,9 +369,25 @@ input WindowSpecsInput {
 
 input OptionsDocInput {
   color: String
-  customColor: String,
-  darker: Boolean,
-  extraDetails: String,
-  window: [String],
+  customColor: String
+  darker: Boolean
+  extraDetails: String
+  window: [String]
+}
+
+input BrickMouldInput {
+  dims: BrickMouldDimsInput
+  size: Int
+  specs: String
+}
+input BrickMouldDimsInput {
+  height: BrickMouldDimInput
+  width: BrickMouldDimInput
+}
+
+input BrickMouldDimInput {
+  decimal: Float
+  fraction: String
+  inch: Int
 }
 `
