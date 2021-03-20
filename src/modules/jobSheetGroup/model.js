@@ -11,6 +11,22 @@ const jobSheetGroupSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'Jobsheet',
     },
+    brickmould: {
+      dims: {
+        height: {
+          decimal: Number,
+          fraction: String,
+          inch: Number,
+        },
+        width: {
+          decimal: Number,
+          fraction: String,
+          inch: Number,
+        },
+      },
+      size: Number,
+      specs: String,
+    },
     costs: {
       discountAmount: { default: 0.00, type: Number },
       discounted: { default: 0.00, type: Number },

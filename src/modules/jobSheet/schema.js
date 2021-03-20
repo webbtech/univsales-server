@@ -69,6 +69,7 @@ type JobSheetData {
 
 type JobSheetGroup {
   _id: ID!
+  brickmould: BrickMould
   costs: JobSheetGroupCosts
   createdAt: String
   dims: JobSheetGroupDims
@@ -82,7 +83,7 @@ type JobSheetGroup {
 
 type JobSheetGroupCosts {
   discounted: Float
-  discountedAmount: Float
+  discountAmount: Float
   extendTotal: Float
   extendUnit: Float
   install: Float
@@ -120,7 +121,7 @@ type JobSheetGroupSpecs {
 
 type JobSheetItemCosts {
   discounted: Float
-  discountedAmount: Float
+  discountAmount: Float
   extendTotal: Float
   extendUnit: Float
   install: Float
@@ -201,7 +202,7 @@ type OptionsDoc {
 
 type BrickMould {
   dims: BrickMouldDims
-  size: Int
+  size: Float
   specs: String
 }
 
@@ -247,6 +248,7 @@ input GroupHWDimsInput {
 
 input GroupInput {
   _id: ID
+  brickmould: BrickMouldInput
   costs: GroupCostsInput
   dims: GroupHWDimsInput
   items: [GroupItemInput]
@@ -321,7 +323,7 @@ input OtherSpecsInput {
 
 input WindowCostsInput {
   discounted: Float
-  discountedAmount: Float
+  discountAmount: Float
   extendTotal: Float
   extendUnit: Float
   install: Float
@@ -348,6 +350,7 @@ input WindowHWDimsInput {
 
 input WindowInput {
   _id: ID
+  brickmould: BrickMouldInput
   costs: WindowCostsInput
   dims: WindowHWDimsInput
   jobsheetID: ID!
@@ -377,9 +380,10 @@ input OptionsDocInput {
 
 input BrickMouldInput {
   dims: BrickMouldDimsInput
-  size: Int
+  size: Float
   specs: String
 }
+
 input BrickMouldDimsInput {
   height: BrickMouldDimInput
   width: BrickMouldDimInput

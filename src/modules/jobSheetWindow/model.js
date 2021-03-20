@@ -15,15 +15,17 @@ const jobSheetWindowSchema = new Schema(
       required: true,
     },
     brickmould: {
-      height: {
-        decimal: Number,
-        fraction: String,
-        inch: { required: true, type: Number },
-      },
-      width: {
-        decimal: Number,
-        fraction: String,
-        inch: { required: true, type: Number },
+      dims: {
+        height: {
+          decimal: Number,
+          fraction: String,
+          inch: Number,
+        },
+        width: {
+          decimal: Number,
+          fraction: String,
+          inch: Number,
+        },
       },
       size: Number,
       specs: String,
