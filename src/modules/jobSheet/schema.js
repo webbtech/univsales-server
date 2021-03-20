@@ -69,6 +69,7 @@ type JobSheetData {
 
 type JobSheetGroup {
   _id: ID!
+  brickmould: BrickMould
   costs: JobSheetGroupCosts
   createdAt: String
   dims: JobSheetGroupDims
@@ -82,7 +83,7 @@ type JobSheetGroup {
 
 type JobSheetGroupCosts {
   discounted: Float
-  discountedAmount: Float
+  discountAmount: Float
   extendTotal: Float
   extendUnit: Float
   install: Float
@@ -120,7 +121,7 @@ type JobSheetGroupSpecs {
 
 type JobSheetItemCosts {
   discounted: Float
-  discountedAmount: Float
+  discountAmount: Float
   extendTotal: Float
   extendUnit: Float
   install: Float
@@ -146,6 +147,7 @@ type JobSheetOther {
 
 type JobSheetWindow {
   _id: ID!
+  brickmould: BrickMould
   costs: JobSheetItemCosts
   createdAt: String
   dims: JobSheetWindowDims
@@ -192,10 +194,27 @@ type WindowDims {
 
 type OptionsDoc {
   color: String
-  customColor: String,
-  darker: Boolean,
-  extraDetails: String,
-  window: [String],
+  customColor: String
+  darker: Boolean
+  extraDetails: String
+  window: [String]
+}
+
+type BrickMould {
+  dims: BrickMouldDims
+  size: Float
+  specs: String
+}
+
+type BrickMouldDim {
+  decimal: Float
+  inch: Int
+  fraction: String
+}
+
+type BrickMouldDims {
+  height: BrickMouldDim
+  width: BrickMouldDim
 }
 
 #
@@ -229,6 +248,7 @@ input GroupHWDimsInput {
 
 input GroupInput {
   _id: ID
+  brickmould: BrickMouldInput
   costs: GroupCostsInput
   dims: GroupHWDimsInput
   items: [GroupItemInput]
@@ -303,7 +323,7 @@ input OtherSpecsInput {
 
 input WindowCostsInput {
   discounted: Float
-  discountedAmount: Float
+  discountAmount: Float
   extendTotal: Float
   extendUnit: Float
   install: Float
@@ -330,6 +350,7 @@ input WindowHWDimsInput {
 
 input WindowInput {
   _id: ID
+  brickmould: BrickMouldInput
   costs: WindowCostsInput
   dims: WindowHWDimsInput
   jobsheetID: ID!
@@ -351,9 +372,26 @@ input WindowSpecsInput {
 
 input OptionsDocInput {
   color: String
-  customColor: String,
-  darker: Boolean,
-  extraDetails: String,
-  window: [String],
+  customColor: String
+  darker: Boolean
+  extraDetails: String
+  window: [String]
+}
+
+input BrickMouldInput {
+  dims: BrickMouldDimsInput
+  size: Float
+  specs: String
+}
+
+input BrickMouldDimsInput {
+  height: BrickMouldDimInput
+  width: BrickMouldDimInput
+}
+
+input BrickMouldDimInput {
+  decimal: Float
+  fraction: String
+  inch: Int
 }
 `

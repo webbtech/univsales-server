@@ -14,6 +14,22 @@ const jobSheetWindowSchema = new Schema(
       ref: 'Product',
       required: true,
     },
+    brickmould: {
+      dims: {
+        height: {
+          decimal: Number,
+          fraction: String,
+          inch: Number,
+        },
+        width: {
+          decimal: Number,
+          fraction: String,
+          inch: Number,
+        },
+      },
+      size: Number,
+      specs: String,
+    },
     costs: {
       discountAmount: { default: null, type: Number },
       discounted: { default: 0.00, type: Number },
