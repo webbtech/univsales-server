@@ -34,3 +34,18 @@ test('production params', async () => {
   expect(Object.keys(c).length).toBeGreaterThan(2)
   expect(c.mongoDBPassword).toBeTruthy()
 })
+
+describe('stage params', () => {
+  it('loads SSM params', async () => {
+    process.env.Stage = 'stage'
+    const ssm = await cfg.loadSSM()
+    expect(ssm).toBe(true)
+  })
+
+  it('returns accurate DB Name', async () => {
+    process.env.Stage = 'stage'
+    await cfg.loadSSM()
+    const c = await cfg.load()
+    expect(c.mongoDBName).toEqual('universal-sales-test')
+  })
+})

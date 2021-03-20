@@ -1,0 +1,223 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Universal API Lambda Graphql Server
+Parameters:
+  ParamCertificateArn:
+    Description: Domain Certificate Arn
+    Type: String
+  ParamCustomDomainName:
+    Description: Custom Domain Name
+    Type: String
+  ParamENV:
+    Description: Stage environment
+    Type: String
+  ParamHostedZoneId:
+    Description: Hosted Zone ID
+    Type: String
+  ParamKMSKeyID:
+    Description: KMS key id
+    Type: String
+  ParamProjectName:
+    Type: String
+    Description: Name of the API - used to generate unique names for resources
+    MinLength: 3
+    MaxLength: 20
+    AllowedPattern: ^[a-zA-Z][a-zA-Z0-9_-]*$
+  ParamSecurityGroupIds:
+    Description: SecurityGroupIds
+    ConstraintDescription: must be list of EC2 security group ids
+    Type: List<AWS::EC2::SecurityGroup::Id>
+  ParamSubnetIds:
+    Description: SecurityGroupIds
+    ConstraintDescription: must be list of EC2 subnet ids
+    Type: List<AWS::EC2::Subnet::Id>
+Resources:
+  Api:
+    Type: AWS::Serverless::Api
+    DeletionPolicy: Delete
+    DependsOn: Lambda
+    Properties:
+      EndpointConfiguration: REGIONAL
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: LambdaTokenAuthorizer
+        Authorizers:
+          LambdaTokenAuthorizer:
+            FunctionArn:
+              Fn::GetAtt:
+              - AuthLambda
+              - Arn
+            Identity:
+              ReauthorizeEvery: 300
+      GatewayResponses:
+        UNAUTHORIZED:
+          StatusCode: 401
+          ResponseTemplates:
+            application/json: '{ "message": $context.error.messageString }'
+          ResponseParameters:
+            Headers:
+              Access-Control-Expose-Headers: "'WWW-Authenticate'"
+              Access-Control-Allow-Origin: "'*'"
+              Access-Control-Allow-Headers: "'*'"
+      Domain:
+        DomainName:
+          Ref: ParamCustomDomainName
+        CertificateArn:
+          Ref: ParamCertificateArn
+        EndpointConfiguration: REGIONAL
+        Route53:
+          HostedZoneId:
+            Ref: ParamHostedZoneId
+          EvaluateTargetHealth: true
+          DistributionDomainName:
+            Value:
+              Fn::Sub: https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/
+  Lambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: graphql.graphqlHandler
+      Runtime: nodejs10.x
+      CodeUri: s3://univsales-lambdas/api-stage/abbcee50f810b409df4067fad3d15fc5
+      Role:
+        Fn::GetAtt:
+        - LambdaRole
+        - Arn
+      Timeout: 10
+      MemorySize: 512
+      Tracing: Active
+      Environment:
+        Variables:
+          NODE_ENV:
+            Ref: ParamENV
+          Stage:
+            Ref: ParamENV
+      VpcConfig:
+        SecurityGroupIds:
+          Ref: ParamSecurityGroupIds
+        SubnetIds:
+          Ref: ParamSubnetIds
+      Tags:
+        BillTo: Universal
+      Events:
+        GraphqlRequest:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: Api
+            Path: /graphql
+            Method: POST
+            Auth:
+              Authorizer: LambdaTokenAuthorizer
+        Options:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: Api
+            Path: /graphql
+            Method: OPTIONS
+            Auth:
+              Authorizer: NONE
+  AuthLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://univsales-lambdas/api-stage/abbcee50f810b409df4067fad3d15fc5
+      Handler: authorizer/index.handler
+      Runtime: nodejs10.x
+      MemorySize: 256
+      Tracing: Active
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName:
+        Fn::Sub: ${ParamProjectName}-role
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Action:
+          - sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+      Policies:
+      - PolicyName: FunctionLogAccess
+        PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+          - Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+            Effect: Allow
+            Resource: '*'
+      - PolicyName: FunctionXRayAccess
+        PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+          - Action:
+            - xray:PutTraceSegments
+            - xray:PutTelemetryRecords
+            Effect: Allow
+            Resource: '*'
+      - PolicyName: FunctionS3Access
+        PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+          - Action:
+            - s3:*
+            Effect: Allow
+            Resource: arn:aws:s3:::*
+      - PolicyName: FunctionParameterAccess
+        PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+          - Action:
+            - ssm:GetParametersByPath
+            Effect: Allow
+            Resource:
+              Fn::Sub: arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${ParamENV}/univsales-api*
+      - PolicyName: FunctionKMSAccess
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - kms:Decrypt
+            - kms:DescribeKey
+            Resource:
+              Fn::Sub: arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/${ParamKMSKeyID}
+      - PolicyName: FunctionVPCAccess
+        PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+          - Action:
+            - ec2:CreateNetworkInterface
+            - ec2:DeleteNetworkInterface
+            - ec2:DescribeNetworkInterfaces
+            Effect: Allow
+            Resource: '*'
+Outputs:
+  ApiId:
+    Description: API ID
+    Value:
+      Ref: Api
+  ApiUrl:
+    Description: API endpoint URL for Prod environment
+    Value:
+      Fn::Sub: https://${Api}.execute-api.${AWS::Region}.amazonaws.com/Prod/
+  LambdaARN:
+    Description: The Lambda Arn
+    Value:
+      Fn::GetAtt:
+      - Lambda
+      - Arn
+  AuthLambdaARN:
+    Description: The Authorization Lambda Arn
+    Value:
+      Fn::GetAtt:
+      - AuthLambda
+      - Arn
+  DomainInvokeURL:
+    Description: Domain Invoke URL
+    Value:
+      Fn::Sub: https://${ParamCustomDomainName}

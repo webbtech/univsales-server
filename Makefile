@@ -1,8 +1,17 @@
+# if the ENV environment variable is not set to either stage or prod, makefile will fail
+# ENV is confirmed below in the check_env directive
+# example:
+# for stage run: ENV=stage make
+# for production run: ENV=prod make
+
 include .env
 
-default: compileapp awsPackage awsDeploy
+default: check_env compileapp awspackage awsdeploy
 
-deploy: buildapp awsPackage awsDeploy
+deploy: check_env buildapp awspackage awsdeploy
+
+check_env:
+	@echo -n "Your environment is $(ENV)? [y/N] " && read ans && [ $${ans:-N} = y ]
 
 buildapp:
 	@rm -fr build/* && \
@@ -24,7 +33,7 @@ compileapp:
 run: compileapp
 	sam local start-api -n env.json
 
-awsPackage:
+awspackage:
 	@aws cloudformation package \
    --template-file ${FILE_TEMPLATE} \
    --output-template-file ${FILE_PACKAGE} \
@@ -33,11 +42,11 @@ awsPackage:
    --profile $(AWS_PROFILE) \
    --region $(AWS_REGION)
 
-awsDeploy:
+awsdeploy:
 	@aws cloudformation deploy \
    --template-file ${FILE_PACKAGE} \
    --region $(AWS_REGION) \
-   --stack-name $(PROJECT_NAME) \
+   --stack-name $(AWS_STACK_NAME) \
    --capabilities CAPABILITY_NAMED_IAM \
    --profile $(AWS_PROFILE) \
    --force-upload \
@@ -47,15 +56,15 @@ awsDeploy:
 			ParamENV=$(ENV) \
 			ParamHostedZoneId=$(HOSTED_ZONE_ID) \
 			ParamKMSKeyID=$(KMS_KEY_ID) \
-			ParamProjectName=$(PROJECT_NAME) \
-			ParamStorageBucket=$(AWS_STORAGE_BUCKET) \
+			ParamAccountId=$(AWS_ACCOUNT_ID) \
+			ParamProjectName=$(AWS_STACK_NAME) \
 			ParamSecurityGroupIds=$(SECURITY_GROUP_IDS) \
 			ParamSubnetIds=$(SUBNET_IDS)
 
 describe:
 	@aws cloudformation describe-stacks \
 		--region $(AWS_REGION) \
-		--stack-name $(PROJECT_NAME)
+		--stack-name $(AWS_STACK_NAME)
 
 outputs:
 	@ make describe \
