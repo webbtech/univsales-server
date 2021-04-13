@@ -18,6 +18,8 @@ const DOC_TYPE_QUOTE = 'quote'
 const DOC_TYPE_INVOICE = 'invoice'
 const validDocTypes = [DOC_TYPE_INVOICE, DOC_TYPE_QUOTE]
 
+const isProdEnv = process.env.NODE_ENV === 'production'
+
 const defaults = {
   discount: {
     description: '',
@@ -321,6 +323,7 @@ const quotePersist = async (input, cfg, token) => {
   let quoteReturn
   try {
     if (isNew) {
+      // FIXME: convert to object spread
       // eslint-disable-next-line prefer-object-spread
       const quoteWithDefaults = Object.assign({}, quote, defaults)
       quoteReturn = await Quote.create(quoteWithDefaults)
@@ -336,20 +339,22 @@ const quotePersist = async (input, cfg, token) => {
   }
 
   // Save PDF
-  const pdfArgs = {
-    quoteID: quoteReturn._id,
-    docType: 'quote',
-  }
-  if (!isNew) {
-    try {
-      const ret = await savePDF(pdfArgs, cfg, token)
-      // we only want to return error
-      if (typeof ret === 'object') {
-        console.info('ret on savePDF in resolver:', ret) // eslint-disable-line no-console
-        return ret
+  if (isProdEnv) {
+    const pdfArgs = {
+      quoteID: quoteReturn._id,
+      docType: 'quote',
+    }
+    if (!isNew) {
+      try {
+        const ret = await savePDF(pdfArgs, cfg, token)
+        // we only want to return error
+        if (typeof ret === 'object') {
+          console.info('ret on savePDF in resolver:', ret) // eslint-disable-line no-console
+          return ret
+        }
+      } catch (e) {
+        throw new Error(e)
       }
-    } catch (e) {
-      throw new Error(e)
     }
   }
   console.info('Successfully saved quote with id: ', quoteReturn._id) // eslint-disable-line no-console
@@ -370,7 +375,7 @@ const quoteRemove = async (id, cfg) => {
     throw new Error('Cannot delete an invoice with payments')
   }
 
-  if (quote.invoiced) {
+  if (quote.invoiced && isProdEnv) {
     deletePDFs({ docType: 'invoice', number: quote.number }, cfg)
     deletePDFs({ docType: 'worksheet', number: quote.number }, cfg)
     await Quote.findOneAndUpdate(
@@ -384,7 +389,9 @@ const quoteRemove = async (id, cfg) => {
     }
   }
 
-  await deletePDFs({ docType: 'quote', number: quote.number }, cfg)
+  if (isProdEnv) {
+    await deletePDFs({ docType: 'quote', number: quote.number }, cfg)
+  }
 
   try {
     const quoteReturn = await Quote.deleteOne({ _id: id })
@@ -403,35 +410,37 @@ const createInvoice = async (id, cfg, token) => {
   }
 
   // Save PDF
-  const pdfArgs = {
-    quoteID: id,
-    docType: 'invoice',
-  }
-  try {
-    const ret = await savePDF(pdfArgs, cfg, token)
-    // we only want to return error
-    if (typeof ret === 'object') {
-      console.info('ret on savePDF in resolver:', ret) // eslint-disable-line no-console
-      return ret
+  if (isProdEnv) {
+    const pdfArgs = {
+      quoteID: id,
+      docType: 'invoice',
     }
-  } catch (e) {
-    throw new Error(e)
-  }
+    try {
+      const ret = await savePDF(pdfArgs, cfg, token)
+      // we only want to return error
+      if (typeof ret === 'object') {
+        console.info('ret on savePDF in resolver:', ret) // eslint-disable-line no-console
+        return ret
+      }
+    } catch (e) {
+      throw new Error(e)
+    }
 
-  // Save worksheet
-  const wrkShtArgs = {
-    quoteID: id,
-    docType: 'invoice',
-  }
-  try {
-    const ret = await saveWrkShtPDF(wrkShtArgs, cfg, token)
-    // we only want to return error
-    if (typeof ret === 'object') {
-      console.info('ret on saveWrkShtPDF in resolver:', ret) // eslint-disable-line no-console
-      return ret
+    // Save worksheet
+    const wrkShtArgs = {
+      quoteID: id,
+      docType: 'invoice',
     }
-  } catch (e) {
-    throw new Error(e)
+    try {
+      const ret = await saveWrkShtPDF(wrkShtArgs, cfg, token)
+      // we only want to return error
+      if (typeof ret === 'object') {
+        console.info('ret on saveWrkShtPDF in resolver:', ret) // eslint-disable-line no-console
+        return ret
+      }
+    } catch (e) {
+      throw new Error(e)
+    }
   }
 
   return Quote.findOneAndUpdate(
