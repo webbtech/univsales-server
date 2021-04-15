@@ -77,7 +77,7 @@ Resources:
     Properties:
       Handler: graphql.graphqlHandler
       Runtime: nodejs10.x
-      CodeUri: s3://univsales-lambdas/api-stage/abbcee50f810b409df4067fad3d15fc5
+      CodeUri: s3://univsales-lambdas/api-stage/0e8ad7328ad22c18cc92d258120c3eda
       Role:
         Fn::GetAtt:
         - LambdaRole
@@ -120,7 +120,7 @@ Resources:
   AuthLambda:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://univsales-lambdas/api-stage/abbcee50f810b409df4067fad3d15fc5
+      CodeUri: s3://univsales-lambdas/api-stage/0e8ad7328ad22c18cc92d258120c3eda
       Handler: authorizer/index.handler
       Runtime: nodejs10.x
       MemorySize: 256

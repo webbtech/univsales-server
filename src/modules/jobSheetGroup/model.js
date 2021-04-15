@@ -12,6 +12,16 @@ const jobSheetGroupSchema = new Schema(
       ref: 'Jobsheet',
     },
     brickmould: {
+      calcSize: {
+        height: {
+          decimal: Number,
+          fraction: String,
+        },
+        width: {
+          decimal: Number,
+          fraction: String,
+        },
+      },
       dims: {
         height: {
           decimal: Number,
