@@ -36,5 +36,5 @@ const server = new ApolloServer({
 server.context = context
 
 server.listen().then(({ url }) => {
-  console.log(`🚀 Server ready at ${url}`) // eslint-disable-line
+  console.log(`🚀 Server ready at ${url} with environment: ${process.env.NODE_ENV}`) // eslint-disable-line
 })

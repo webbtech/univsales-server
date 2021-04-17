@@ -49,13 +49,21 @@ db.setUri = function setUri() {
     throw new Error('Missing mongoDBName')
   }
 
-  if (this.cfg.nodeEnv === 'stage') {
+  /* if (this.cfg.nodeEnv === 'stage') {
     // we expect that username and password are set in config
     if (!this.cfg.mongoDBUsername || !this.cfg.mongoDBPassword) {
       throw new Error('Missing mongoDBUsername or mongoDBPassword in config')
     }
     this.uri = `mongodb+srv://${this.cfg.mongoDBUsername}:${this.cfg.mongoDBPassword}@${this.cfg.mongoDBHost}/${this.cfg.mongoDBName}?retryWrites=true&w=majority`
   } else if (this.cfg.nodeEnv === 'prod') {
+    if (!this.cfg.mongoDBUsername || !this.cfg.mongoDBPassword) {
+      throw new Error('Missing mongoDBUsername or mongoDBPassword in config')
+    }
+    this.uri = `mongodb://${this.cfg.mongoDBUsername}:${this.cfg.mongoDBPassword}@${this.cfg.mongoDBHost}/${this.cfg.mongoDBName}?retryWrites=true&authSource=admin&replicaSet=${this.cfg.mongoDBReplSet}`
+  } else {
+    this.uri = `mongodb://${this.cfg.mongoDBHost}/${this.cfg.mongoDBName}`
+  } */
+  if (this.cfg.nodeEnv === 'prod' || this.cfg.nodeEnv === 'stage') {
     if (!this.cfg.mongoDBUsername || !this.cfg.mongoDBPassword) {
       throw new Error('Missing mongoDBUsername or mongoDBPassword in config')
     }

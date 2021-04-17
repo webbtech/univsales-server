@@ -13,7 +13,7 @@ const context = async ({ event }) => {
   // console.log('event.headers:', event.headers)
   const token = event.headers.Authorization
   if (!db) {
-    console.log('initializing db and cfg') // eslint-disable-line no-console
+    console.log(`Initializing db and cfg for env: ${process.env.NODE_ENV}`) // eslint-disable-line no-console
     cfg = await config.load()
     db = await mongoose.connect(cfg)
   }

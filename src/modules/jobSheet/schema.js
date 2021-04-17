@@ -201,9 +201,25 @@ type OptionsDoc {
 }
 
 type BrickMould {
+  calcSize: BrickMouldCalcs
   dims: BrickMouldDims
   size: Float
   specs: String
+}
+
+type BrickMouldCalcs {
+  height: BrickMouldCalc
+  width: BrickMouldCalc
+}
+
+type BrickMouldCalc {
+  decimal: Float
+  fraction: String
+}
+
+type BrickMouldDims {
+  height: BrickMouldDim
+  width: BrickMouldDim
 }
 
 type BrickMouldDim {
@@ -212,10 +228,7 @@ type BrickMouldDim {
   fraction: String
 }
 
-type BrickMouldDims {
-  height: BrickMouldDim
-  width: BrickMouldDim
-}
+
 
 #
 ## ================================== Inputs ==================================
@@ -379,9 +392,20 @@ input OptionsDocInput {
 }
 
 input BrickMouldInput {
+  calcSize: BrickMouldCalcsInput
   dims: BrickMouldDimsInput
   size: Float
   specs: String
+}
+
+input BrickMouldCalcsInput {
+  height: BrickMouldCalcInput
+  width: BrickMouldCalcInput
+}
+
+input BrickMouldCalcInput {
+  decimal: Float
+  fraction: String
 }
 
 input BrickMouldDimsInput {

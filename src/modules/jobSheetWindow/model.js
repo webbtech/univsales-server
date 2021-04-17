@@ -15,6 +15,16 @@ const jobSheetWindowSchema = new Schema(
       required: true,
     },
     brickmould: {
+      calcSize: {
+        height: {
+          decimal: Number,
+          fraction: String,
+        },
+        width: {
+          decimal: Number,
+          fraction: String,
+        },
+      },
       dims: {
         height: {
           decimal: Number,

@@ -95,3 +95,4 @@ docs/ssm.md
 docs/cognito.md
 testDB/
 src/authorizer/constants.js
+*.bak
