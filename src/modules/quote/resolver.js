@@ -108,7 +108,8 @@ const searchQuotes = async ({ closed, invoiced, year }) => {
 
   let qts
 
-  if (!Number.isNaN(Number(year))) {
+  const yr = Number(year)
+  if (!Number.isNaN(yr) && yr > 0) {
     const sDte = moment().year(year).startOf('year').utc()
     const eDte = sDte.clone().endOf('year').utc()
     q.createdAt = { $gte: sDte, $lte: eDte }
@@ -124,7 +125,6 @@ const searchQuotes = async ({ closed, invoiced, year }) => {
       .sort({ updatedAt: -1 })
       .limit(LATEST_LIMIT)
   }
-  console.log('q: ', q)
 
   let quotes
   try {
