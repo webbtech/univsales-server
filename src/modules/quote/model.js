@@ -72,7 +72,7 @@ const quoteSchema = new Schema(
   },
   {
     timestamps: true,
-  }
+  },
 )
 
 const Quote = mongoose.model('Quote', quoteSchema)

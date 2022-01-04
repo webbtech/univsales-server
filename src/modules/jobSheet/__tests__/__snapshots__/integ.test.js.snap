@@ -7,15 +7,15 @@ Object {
       "groups": Array [
         Object {
           "__typename": "JobSheetGroup",
-          "_id": "5b19df4a2aac04041e7ebff5",
+          "_id": "5b1a6fe92aac0423f37ec022",
           "costs": Object {
             "__typename": "JobSheetGroupCosts",
-            "extendTotal": 2010,
-            "extendUnit": 2010,
-            "install": 600,
-            "installType": 300,
-            "netUnit": 2010,
-            "options": 150,
+            "extendTotal": 1830,
+            "extendUnit": 1830,
+            "install": 500,
+            "installType": 250,
+            "netUnit": 1830,
+            "options": 120,
             "trim": 100,
             "windows": 860,
           },
@@ -53,15 +53,15 @@ Object {
         },
         Object {
           "__typename": "JobSheetGroup",
-          "_id": "5b1a6fe92aac0423f37ec022",
+          "_id": "5b19df4a2aac04041e7ebff5",
           "costs": Object {
             "__typename": "JobSheetGroupCosts",
-            "extendTotal": 1830,
-            "extendUnit": 1830,
-            "install": 500,
-            "installType": 250,
-            "netUnit": 1830,
-            "options": 120,
+            "extendTotal": 2010,
+            "extendUnit": 2010,
+            "install": 600,
+            "installType": 300,
+            "netUnit": 2010,
+            "options": 150,
             "trim": 100,
             "windows": 860,
           },
@@ -153,27 +153,6 @@ Ok",
       "windows": Array [
         Object {
           "__typename": "JobSheetWindow",
-          "_id": "5b18474a2aac045b127ebfeb",
-          "costs": Object {
-            "__typename": "JobSheetItemCosts",
-            "extendTotal": 1185,
-            "extendUnit": 1185,
-            "install": 300,
-            "installType": 200,
-            "netUnit": 1185,
-            "options": 60,
-            "trim": 75,
-            "window": 550,
-          },
-          "createdAt": "1528317732135",
-          "qty": 1,
-          "rooms": Array [
-            "BR",
-          ],
-          "updatedAt": "1582571334118",
-        },
-        Object {
-          "__typename": "JobSheetWindow",
           "_id": "5b1847242aac0405487ebfea",
           "costs": Object {
             "__typename": "JobSheetItemCosts",
@@ -192,6 +171,27 @@ Ok",
             "BR",
           ],
           "updatedAt": "1528317755342",
+        },
+        Object {
+          "__typename": "JobSheetWindow",
+          "_id": "5b18474a2aac045b127ebfeb",
+          "costs": Object {
+            "__typename": "JobSheetItemCosts",
+            "extendTotal": 1185,
+            "extendUnit": 1185,
+            "install": 300,
+            "installType": 200,
+            "netUnit": 1185,
+            "options": 60,
+            "trim": 75,
+            "window": 550,
+          },
+          "createdAt": "1528317732135",
+          "qty": 1,
+          "rooms": Array [
+            "BR",
+          ],
+          "updatedAt": "1582571334118",
         },
         Object {
           "__typename": "JobSheetWindow",
@@ -229,6 +229,36 @@ exports[`searchJobSheetsByCustomer 1`] = `
 Object {
   "data": Object {
     "searchJobSheetsByCustomer": Array [
+      Object {
+        "_id": "6075f25f45554b07efca5300",
+        "addressID": Object {
+          "_id": "6075f25f45554b07efca52ff",
+          "city": "Welland",
+          "street1": "44 Green Pointe Drive",
+        },
+        "number": 2020,
+        "updatedAt": "1618342495982",
+      },
+      Object {
+        "_id": "6075f1ac45554b07efca52fc",
+        "addressID": Object {
+          "_id": "6075f1ac45554b07efca52fb",
+          "city": "Welland",
+          "street1": "44 Green Pointe Drive",
+        },
+        "number": 2019,
+        "updatedAt": "1618342316639",
+      },
+      Object {
+        "_id": "6053574dc1e3140007ff2578",
+        "addressID": Object {
+          "_id": "5b2122152aac0418527ec06e",
+          "city": "Hamilton",
+          "street1": "Hamilton St",
+        },
+        "number": 2013,
+        "updatedAt": "1616074573695",
+      },
       Object {
         "_id": "5ce69196ec2d8e7c1cb03dec",
         "addressID": Object {
