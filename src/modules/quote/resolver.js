@@ -1,11 +1,10 @@
-/* eslint-disable import/prefer-default-export */
+/* eslint-disable import/prefer-default-export, no-use-before-define */
 import mongoose from 'mongoose'
 import moment from 'moment'
 import ramda from 'ramda'
 import fetch from 'node-fetch'
 import AWS from 'aws-sdk'
 
-import { indexOf } from 'lodash'
 import Address from '../address/model'
 import Quote from './model'
 import QuoteMeta from './metaModel'
@@ -18,7 +17,7 @@ const DOC_TYPE_QUOTE = 'quote'
 const DOC_TYPE_INVOICE = 'invoice'
 const validDocTypes = [DOC_TYPE_INVOICE, DOC_TYPE_QUOTE]
 
-const isProdEnv = process.env.NODE_ENV === 'production'
+const isProdEnv = process.env.NODE_ENV === 'prod'
 
 const defaults = {
   discount: {
@@ -107,7 +106,9 @@ const searchQuotes = async ({ closed, invoiced, year }) => {
   }
 
   let qts
-  if (year && year.length) {
+
+  const yr = Number(year)
+  if (!Number.isNaN(yr) && yr > 0) {
     const sDte = moment().year(year).startOf('year').utc()
     const eDte = sDte.clone().endOf('year').utc()
     q.createdAt = { $gte: sDte, $lte: eDte }

@@ -87,6 +87,9 @@ typings/
 # DynamoDB Local files
 .dynamodb/
 
+# SAM package files
+package-*.yml
+
 # misc
 scratch
 build/

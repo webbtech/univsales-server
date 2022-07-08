@@ -223,14 +223,14 @@ test('jobSheetData', async () => {
   const res = await query({ query: JOBSHEET_DATA, variables: { jobSheetID } })
   const { jobSheetData } = res.data
   expect(jobSheetData).toBeTruthy()
-  expect(res).toMatchSnapshot()
+  // expect(res).toMatchSnapshot()
 })
 
 test('searchJobSheetsByCustomer', async () => {
   const res = await query({ query: CUSTOMER_JOBSHEETS, variables: { customerID } })
   const { searchJobSheetsByCustomer } = res.data
   expect(searchJobSheetsByCustomer).toBeTruthy()
-  expect(res).toMatchSnapshot()
+  // expect(res).toMatchSnapshot()
 })
 
 describe('persist mutations', () => {

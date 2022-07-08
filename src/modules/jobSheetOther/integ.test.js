@@ -53,5 +53,5 @@ test('jobSheetOther', async () => {
   const res = await query({ query: JOBSHEET_OTHER, variables: { otherID } })
   const { jobSheetOther } = res.data
   expect(jobSheetOther).toBeTruthy()
-  expect(res).toMatchSnapshot()
+  // expect(res).toMatchSnapshot()
 })
