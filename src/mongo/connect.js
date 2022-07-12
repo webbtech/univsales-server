@@ -67,7 +67,22 @@ db.setUri = function setUri() {
     if (!this.cfg.mongoDBUsername || !this.cfg.mongoDBPassword) {
       throw new Error('Missing mongoDBUsername or mongoDBPassword in config')
     }
-    this.uri = `mongodb://${this.cfg.mongoDBUsername}:${this.cfg.mongoDBPassword}@${this.cfg.mongoDBHost}/${this.cfg.mongoDBName}?retryWrites=true&authSource=admin&replicaSet=${this.cfg.mongoDBReplSet}`
+    // this.uri = `mongodb+srv://${this.cfg.mongoDBHost}/${this.cfg.mongoDBName}?authSource=$external&authMechanism=MONGODB-AWS&retryWrites=true&w=majority`
+    // "mongodb+srv://<AWS access key>:<AWS secret key>@peer0.mvx5f.mongodb.net/?authSource=%24external&authMechanism=MONGODB-AWS&retryWrites=true&w=majority&authMechanismProperties=AWS_SESSION_TOKEN:<session token (for AWS IAM Roles)>"
+    // this.uri = `mongodb://${this.cfg.mongoDBUsername}:${this.cfg.mongoDBPassword}@${this.cfg.mongoDBHost}/${this.cfg.mongoDBName}?retryWrites=true&authSource=admin&replicaSet=${this.cfg.mongoDBReplSet}`
+
+    // mongodb+srv://admin:<password>@peer0.mvx5f.mongodb.net/?retryWrites=true&w=majority
+
+    // this is good for user/pass
+    // this.uri = `mongodb+srv://admin:TYhbQPBzjt8LF29R9h74@${this.cfg.mongoDBHost}/${this.cfg.mongoDBName}?retryWrites=true&w=majority`
+
+    // "mongodb+srv://<AWS access key>:<AWS secret key>@peer0.mvx5f.mongodb.net/?authSource=%24external&authMechanism=MONGODB-AWS&retryWrites=true&w=majority&authMechanismProperties=AWS_SESSION_TOKEN:<session token (for AWS IAM Roles)>"
+    this.uri = `mongodb+srv://peer0.mvx5f.mongodb.net/${this.cfg.mongoDBName}?authSource=%24external&authMechanism=MONGODB-AWS&retryWrites=true&w=majority`
+
+    // above should work, see: https://stackoverflow.com/questions/67198660/why-cant-my-aws-lambda-node-js-app-access-my-mongodb-atlas-cluster
+    // we may have to upgrade mongoose
+
+    console.log('this.uri:  ', this.uri)
   } else {
     this.uri = `mongodb://${this.cfg.mongoDBHost}/${this.cfg.mongoDBName}`
   }

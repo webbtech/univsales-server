@@ -82,7 +82,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: graphql.graphqlHandler
-      Runtime: nodejs10.x
+      Runtime: nodejs16.x
       CodeUri: build/
       Role: !GetAtt LambdaRole.Arn
       Timeout: 10
@@ -127,7 +127,7 @@ Resources:
     Properties:
       CodeUri: build/
       Handler: authorizer/index.handler
-      Runtime: nodejs10.x
+      Runtime: nodejs16.x
       MemorySize: 256
       Tracing: Active
 
