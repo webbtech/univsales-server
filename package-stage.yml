@@ -20,8 +20,8 @@ Parameters:
   ParamProjectName:
     Type: String
     Description: Name of the API - used to generate unique names for resources
-    MinLength: 3
-    MaxLength: 20
+    MinLength: '3'
+    MaxLength: '20'
     AllowedPattern: ^[a-zA-Z][a-zA-Z0-9_-]*$
   ParamSecurityGroupIds:
     Description: SecurityGroupIds
@@ -76,8 +76,8 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: graphql.graphqlHandler
-      Runtime: nodejs10.x
-      CodeUri: s3://univsales-lambdas/api-stage/e2b947b421664dbc4a84e192b3926462
+      Runtime: nodejs16.x
+      CodeUri: s3://univsales-lambdas/api-stage/65e08fa4f214086c5496b3ec0262ed99
       Role:
         Fn::GetAtt:
         - LambdaRole
@@ -120,9 +120,9 @@ Resources:
   AuthLambda:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://univsales-lambdas/api-stage/e2b947b421664dbc4a84e192b3926462
+      CodeUri: s3://univsales-lambdas/api-stage/65e08fa4f214086c5496b3ec0262ed99
       Handler: authorizer/index.handler
-      Runtime: nodejs10.x
+      Runtime: nodejs16.x
       MemorySize: 256
       Tracing: Active
   LambdaRole:
