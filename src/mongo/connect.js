@@ -12,13 +12,8 @@ db.connect = async function connect(cfg) {
   this.cfg = cfg
   this.setUri()
 
-  mongoose.connect(this.uri, { useNewUrlParser: true, useUnifiedTopology: true })
-  mongoose.set('useCreateIndex', true)
-  mongoose.set('useNewUrlParser', true)
-  mongoose.set('useFindAndModify', false)
+  mongoose.connect(this.uri)
 
-  // see: https://medium.com/@vsvaibhav2016/best-practice-of-mongoose-connection-with-mongodb-c470608483f0
-  // for info on best practices
   const dbConn = mongoose.connection
 
   dbConn.on('error', (ee) => {
@@ -45,29 +40,12 @@ db.connect = async function connect(cfg) {
 }
 
 db.setUri = function setUri() {
-  if (!this.cfg.mongoDBName || !this.cfg.mongoDBPort) {
+  if (!this.cfg.mongoDBName) {
     throw new Error('Missing mongoDBName')
   }
 
-  /* if (this.cfg.nodeEnv === 'stage') {
-    // we expect that username and password are set in config
-    if (!this.cfg.mongoDBUsername || !this.cfg.mongoDBPassword) {
-      throw new Error('Missing mongoDBUsername or mongoDBPassword in config')
-    }
-    this.uri = `mongodb+srv://${this.cfg.mongoDBUsername}:${this.cfg.mongoDBPassword}@${this.cfg.mongoDBHost}/${this.cfg.mongoDBName}?retryWrites=true&w=majority`
-  } else if (this.cfg.nodeEnv === 'prod') {
-    if (!this.cfg.mongoDBUsername || !this.cfg.mongoDBPassword) {
-      throw new Error('Missing mongoDBUsername or mongoDBPassword in config')
-    }
-    this.uri = `mongodb://${this.cfg.mongoDBUsername}:${this.cfg.mongoDBPassword}@${this.cfg.mongoDBHost}/${this.cfg.mongoDBName}?retryWrites=true&authSource=admin&replicaSet=${this.cfg.mongoDBReplSet}`
-  } else {
-    this.uri = `mongodb://${this.cfg.mongoDBHost}/${this.cfg.mongoDBName}`
-  } */
   if (this.cfg.nodeEnv === 'prod' || this.cfg.nodeEnv === 'stage') {
-    if (!this.cfg.mongoDBUsername || !this.cfg.mongoDBPassword) {
-      throw new Error('Missing mongoDBUsername or mongoDBPassword in config')
-    }
-    this.uri = `mongodb://${this.cfg.mongoDBUsername}:${this.cfg.mongoDBPassword}@${this.cfg.mongoDBHost}/${this.cfg.mongoDBName}?retryWrites=true&authSource=admin&replicaSet=${this.cfg.mongoDBReplSet}`
+    this.uri = `mongodb+srv://peer0.mvx5f.mongodb.net/${this.cfg.mongoDBName}?authSource=%24external&authMechanism=MONGODB-AWS&retryWrites=true&w=majority`
   } else {
     this.uri = `mongodb://${this.cfg.mongoDBHost}/${this.cfg.mongoDBName}`
   }

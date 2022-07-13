@@ -103,7 +103,8 @@ config.loadSSM = async function loadSSM() {
     ssmVals[p.Name.split('/')[3]] = p.Value
   })
 
-  this.config = Object.assign({}, this.defaults, ssmVals)
+  this.config = Object.assign({}, this.defaults, ssmVals) // eslint-disable-line
+  // this.config = { ...this.defaults, ...ssmVals } // this, oddly, doesn't compile
 
   return true
 }

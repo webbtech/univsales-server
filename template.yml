@@ -23,8 +23,8 @@ Parameters:
   ParamProjectName:
     Type: String
     Description: Name of the API - used to generate unique names for resources
-    MinLength: 3
-    MaxLength: 20
+    MinLength: "3"
+    MaxLength: "20"
     AllowedPattern: '^[a-zA-Z][a-zA-Z0-9_-]*$'
   ParamSecurityGroupIds:
     Description: SecurityGroupIds
@@ -82,7 +82,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: graphql.graphqlHandler
-      Runtime: nodejs10.x
+      Runtime: nodejs16.x
       CodeUri: build/
       Role: !GetAtt LambdaRole.Arn
       Timeout: 10
@@ -127,7 +127,7 @@ Resources:
     Properties:
       CodeUri: build/
       Handler: authorizer/index.handler
-      Runtime: nodejs10.x
+      Runtime: nodejs16.x
       MemorySize: 256
       Tracing: Active
 
@@ -204,9 +204,18 @@ Outputs:
   ApiId:
     Description: "API ID"
     Value: !Ref Api
-  ApiUrl:
+  ApiEndpoint:
     Description: "API endpoint URL for Prod environment"
     Value: !Sub 'https://${Api}.execute-api.${AWS::Region}.amazonaws.com/Prod/'
+  ApiArn:
+    Description: "API ARN"
+    Value: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${Api}/"
+  ApiFQDN:
+    Description: "API Domain Name"
+    Value: !Ref ParamCustomDomainName
+  ApiURL:
+    Description: "API Url"
+    Value: !Sub "https://${ParamCustomDomainName}/"
   LambdaARN:
     Description: The Lambda Arn
     Value: !GetAtt Lambda.Arn
@@ -216,3 +225,6 @@ Outputs:
   DomainInvokeURL:
     Description: "Domain Invoke URL"
     Value: !Sub "https://${ParamCustomDomainName}"
+  LambdaRoleArn:
+    Description: "Lambda Role ARN"
+    Value: !GetAtt LambdaRole.Arn

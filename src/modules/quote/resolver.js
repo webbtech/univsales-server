@@ -17,7 +17,8 @@ const DOC_TYPE_QUOTE = 'quote'
 const DOC_TYPE_INVOICE = 'invoice'
 const validDocTypes = [DOC_TYPE_INVOICE, DOC_TYPE_QUOTE]
 
-const isProdEnv = process.env.NODE_ENV === 'prod'
+// const isProdEnv = process.env.NODE_ENV === 'prod'
+const managePDF = process.env.NODE_ENV === 'prod' || process.env.NODE_ENV === 'stage'
 
 const defaults = {
   discount: {
@@ -340,7 +341,7 @@ const quotePersist = async (input, cfg, token) => {
   }
 
   // Save PDF
-  if (isProdEnv) {
+  if (managePDF) {
     const pdfArgs = {
       quoteID: quoteReturn._id,
       docType: 'quote',
@@ -376,7 +377,7 @@ const quoteRemove = async (id, cfg) => {
     throw new Error('Cannot delete an invoice with payments')
   }
 
-  if (quote.invoiced && isProdEnv) {
+  if (quote.invoiced && managePDF) {
     deletePDFs({ docType: 'invoice', number: quote.number }, cfg)
     deletePDFs({ docType: 'worksheet', number: quote.number }, cfg)
     await Quote.findOneAndUpdate(
@@ -390,7 +391,7 @@ const quoteRemove = async (id, cfg) => {
     }
   }
 
-  if (isProdEnv) {
+  if (managePDF) {
     await deletePDFs({ docType: 'quote', number: quote.number }, cfg)
   }
 
@@ -411,7 +412,7 @@ const createInvoice = async (id, cfg, token) => {
   }
 
   // Save PDF
-  if (isProdEnv) {
+  if (managePDF) {
     const pdfArgs = {
       quoteID: id,
       docType: 'invoice',
