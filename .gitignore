@@ -100,3 +100,4 @@ testDB/
 src/authorizer/constants.js
 *.bak
 package-*.yml
+Dbcommands.md

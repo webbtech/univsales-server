@@ -1,4 +1,5 @@
 
 Todo:
-  ☐ Remove token requirements
+  ☐ Update token requirements and authentication
   ☐ Update SAM template to more current format
+  ☐ Upgrade libs
