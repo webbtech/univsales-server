@@ -44,8 +44,10 @@ db.setUri = function setUri() {
     throw new Error('Missing mongoDBName')
   }
 
+  // FIXME: should be pulling host from cfg not hard coding!!
   if (this.cfg.nodeEnv === 'prod' || this.cfg.nodeEnv === 'stage') {
-    this.uri = `mongodb+srv://peer0.mvx5f.mongodb.net/${this.cfg.mongoDBName}?authSource=%24external&authMechanism=MONGODB-AWS&retryWrites=true&w=majority`
+    // this.uri = `mongodb+srv://peer0.mvx5f.mongodb.net/${this.cfg.mongoDBName}?authSource=%24external&authMechanism=MONGODB-AWS&retryWrites=true&w=majority`
+    this.uri = `mongodb+srv://${this.cfg.mongoDBHost}/${this.cfg.mongoDBName}?authSource=%24external&authMechanism=MONGODB-AWS&retryWrites=true&w=majority`
   } else {
     this.uri = `mongodb://${this.cfg.mongoDBHost}/${this.cfg.mongoDBName}`
   }
